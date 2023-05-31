@@ -13,4 +13,6 @@ def create_connect(ip:str, port:int):
     sock.connect((ip, port))
 
     
-create_connect(socket.gethostbyname_ex(socket.gethostname())[-1][-1], 9999)
+class Boss:
+    def __init__(self):
+        print("OK")
