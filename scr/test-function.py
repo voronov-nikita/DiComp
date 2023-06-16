@@ -1,22 +1,32 @@
-import os
+# Решнение с использованием декораторов для упрощения использования
+# Пускай теперь сам программист будет определять какую часть кода
+# ему необходимо "ускорить", путем отправки файла дальше
 
-with open("test-client.py", 'r') as file:
-    k=1
-    ls=[]
-    s=""
-    for line in file:
-        if "class" in line:
-            project_folder = os.getcwd()
-            p = os.path.join(project_folder, line[6:-2])
-            os.mkdir(p)
-        if "def" in line:
-            ls.append(s)
-            s=""
-        s+=line
-    ls.append(s)
-    del ls[0]
+import inspect
 
+count_tasks = 0
 
-for k in range(len(ls)):
-    with open(f"task{k}.txt", "w") as file_write:
-        file_write.write(ls[k])
+def save_to_file(func):
+    def wrapper(*args, **kwargs):
+        global count_tasks
+        # Получение исходного кода функции
+        source_code = inspect.getsource(func)
+
+        # Запись исходного кода в файл
+        with open(f"task{count_tasks}.txt", "w") as file:
+            file.write(source_code[14:])
+        
+        # Запись всех передаваемых данных для функции
+        with open(f"value{count_tasks}", "w") as file:
+            for elem in args:
+                file.write(elem)
+                file.write("\n")
+
+        count_tasks+=1
+
+        # Вызов функции
+        result = func(*args, **kwargs)
+        print(count_tasks)
+        return result
+
+    return wrapper

@@ -3,6 +3,7 @@
 
 import socket
 
+
 def send_request(request):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('localhost', 9999))
