@@ -1,18 +1,52 @@
-# Это по факту тот, кто отправляет входные данные
-# И принимает ответ от "сервера" в виде результата функции
+# Решнение с использованием декораторов для упрощения использования
+# Пускай теперь сам программист будет определять какую часть кода
+# ему необходимо "ускорить", путем отправки файла дальше
 
+import inspect
 import socket
 
+COUNT_TASKS:int = 0
+LEN_NAME_DECORATOR:int = len("@save_send_file ")
 
-def send_request(request):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 9999))
-    client_socket.send(request.encode())  # Отправляем запрос на сервер
-    response = client_socket.recv(1024).decode()  # Получаем ответ от сервера
-    print("Результат вычислений:", response)
-    client_socket.send(response.encode('utf-8'))
-    client_socket.close()
 
-if __name__ == '__main__':
-    request = input("Введите число для вычислений: ")
-    send_request(request)
+def save_send_file(func):
+    # аодготовка файлов для сервера
+    def wrapper(*args, **kwargs):
+        global COUNT_TASKS
+        # Получение исходного кода функции
+        source_code = inspect.getsource(func)
+
+        # запись 
+        with open(f"task{COUNT_TASKS}.txt", "w") as file:
+            file.write(source_code[LEN_NAME_DECORATOR:])
+        
+
+        with open(f"value{COUNT_TASKS}", "w") as file:
+            for elem in args:
+                file.write(str(elem))
+                file.write("\n")
+
+        COUNT_TASKS+=1
+
+
+    # отправка файла на сервер
+    def send_file(file_name:str, ip:str, port:int):
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            client_socket.connect((ip, port))
+
+        except:
+            print("ERROR CONNECT")
+
+    def get_result():
+        return None
+
+
+    # запуск всех состовляющих
+    def run(*args, **kwargs):
+        wrapper(*args, **kwargs)
+        result = get_result()
+        print(COUNT_TASKS)
+        return result
+
+    return run

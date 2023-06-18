@@ -1,32 +1,18 @@
-# Решнение с использованием декораторов для упрощения использования
-# Пускай теперь сам программист будет определять какую часть кода
-# ему необходимо "ускорить", путем отправки файла дальше
+# Это по факту тот, кто отправляет входные данные
+# И принимает ответ от "сервера" в виде результата функции
 
-import inspect
+import socket
 
-count_tasks = 0
 
-def save_to_file(func):
-    def wrapper(*args, **kwargs):
-        global count_tasks
-        # Получение исходного кода функции
-        source_code = inspect.getsource(func)
+def send_request(request):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(('localhost', 9999))
+    client_socket.send(request.encode())  # Отправляем запрос на сервер
+    response = client_socket.recv(1024).decode()  # Получаем ответ от сервера
+    print("Результат вычислений:", response)
+    client_socket.send(response.encode('utf-8'))
+    client_socket.close()
 
-        # Запись исходного кода в файл
-        with open(f"task{count_tasks}.txt", "w") as file:
-            file.write(source_code[14:])
-        
-        # Запись всех передаваемых данных для функции
-        with open(f"value{count_tasks}", "w") as file:
-            for elem in args:
-                file.write(elem)
-                file.write("\n")
-
-        count_tasks+=1
-
-        # Вызов функции
-        result = func(*args, **kwargs)
-        print(count_tasks)
-        return result
-
-    return wrapper
+if __name__ == '__main__':
+    request = input("Введите число для вычислений: ")
+    send_request(request)

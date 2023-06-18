@@ -34,4 +34,4 @@
 
 <br>
 
-###### 29.05.2023 - last global change.
+###### 18.06.2023 - last global change.
