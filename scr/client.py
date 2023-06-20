@@ -4,17 +4,23 @@
 
 import inspect
 import socket
+import threading
 import os
 
 
 COUNT_TASKS:int = 0
 LEN_NAME_DECORATOR:int = len("@save_send_file ")
+SOCKET_SPEED:int = 4096
 
-IP:str = "localhost"
+IP:str = "127.0.0.1"
 PORT:int = 12345
 
 
+
 def save_send_file(func):
+
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
     # подготовка файлов для сервера
     def wrapper(*args, **kwargs):
         global COUNT_TASKS
@@ -36,28 +42,47 @@ def save_send_file(func):
 
     # отправка файла на сервер
     def send_file(file_name:str):
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        result = None
+
         try:
             client_socket.connect((IP, PORT))
             file = open(file_name, 'rb')
 
-            file_line = file.read(1024)
+            file_line = file.read()
 
-            while file_line:
-                client_socket.send(file_line)
-                file_line = file.read(1024)
+            # отправляем пакет данных
+            client_socket.sendall(file_line)
 
+            # очищаем клиента от лишних данных
             file.close()
             os.remove(f"/{file_name}")
             os.remove(f"/{file_name}")
-                
+
+            # Принимаем ответ от сервера
+            data = client_socket.recv(SOCKET_SPEED)
+            result = data
+
+            while not data:
+                result += data
+
+            return result.decode()
 
         except:
             print("ERROR CONNECT")
 
 
+    # получить результат
+    # здесь мы будем ждать сообщение от сервера до тех пор, пока оно не придет
     def get_result():
-        return None
+        result = None
+        while True:
+            result_data = client_socket.recv(SOCKET_SPEED)
+            if result_data:
+                result = result_data.decode()
+                break
+
+        return result
 
 
     # запуск всех состовляющих
@@ -74,3 +99,4 @@ def save_send_file(func):
         return result
 
     return run
+
