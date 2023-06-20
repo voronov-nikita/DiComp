@@ -1,52 +1,66 @@
+# сервер
+# Здесь будет приниматься вся информация и происходить вычисления
+# потом данные отправляються обратно клиенту
+
+
 import socket
+import subprocess
+import sys
 from threading import Thread
 
 
-server_socket = socket.socket()
-
-IP:str = "172.0.0.1"
+IP:str = "192.168.8.102"
 PORT:int = 12345
 
-server_socket.bind((IP, PORT))
+SOCKET_SPEED:int = 4096
 
 
-server_socket.listen()
-
-
-
-class NewTask(Thread):
-    def __init__(self):
+class NewThread(Thread):
+    def __init__(self, task_number:int):
         pass
 
 
+# сделать запись с полученными данными
+def write_task(number:int, data:bytes):
+    with open(f"new{number}.txt", 'wb') as file:
+        file.write(data)
 
-while True:
-    # начинаем принимать соединения
-    conn, addr = server_socket.accept()
 
-    # выводим информацию о подключении
-    print('connected:', addr)
+def doind_task(file_name:str):
+    subprocess.run(["python", file_name])
+    print(sys.__stdout__)
 
-    # получаем название файла
-    name_f = (conn.recv(1024)).decode ('UTF-8')
 
-    # открываем файл в режиме байтовой записи в отдельной папке 'sent'
-    f = open(name_f,'wb')
+def run_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((IP, PORT))
+    server_socket.listen()
+
+    count_connect:int = 0
+
+    print("<" + "--"*10 + ">")
 
     while True:
+        # принимаем подключения
+        client, adress = server_socket.accept()
 
-        # получаем байтовые строки
-        l = conn.recv(1024)
+        count_connect += 1
 
-        # пишем байтовые строки в файл на сервере
-        f.write(l)
+        print(*adress)
 
-        if not l:
-            break
+        while True:
+            # принимаем данные от клиента
+            data = client.recv(SOCKET_SPEED)
 
-    f.close()
-    conn.close()
+            file_data = data
 
-    print('File received')
+            if file_data:
+                break
 
-sock.close()
+        write_task(count_connect, file_data)
+        doind_task(f"new{count_connect}.txt")
+
+
+
+if __name__=="__main__":
+    run_server()

@@ -3,10 +3,11 @@ from client import save_send_file
 
 @save_send_file
 def one():
+    print(1)
     return 1
 
 
-@save_send_file
+# @save_send_file
 def two():
     return 2
 
@@ -14,6 +15,6 @@ def two():
 def five():
     return 5
 
-one()
-two()
-five()
+print(one())
+print(two(),
+five())

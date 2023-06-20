@@ -2,6 +2,8 @@
 # Пускай теперь сам программист будет определять какую часть кода
 # ему необходимо "ускорить", путем отправки файла дальше
 
+
+# >>> pip install inspect
 import inspect
 import socket
 import threading
@@ -12,7 +14,7 @@ COUNT_TASKS:int = 0
 LEN_NAME_DECORATOR:int = len("@save_send_file ")
 SOCKET_SPEED:int = 4096
 
-IP:str = "127.0.0.1"
+IP:str = "192.168.8.102"
 PORT:int = 12345
 
 
@@ -43,33 +45,34 @@ def save_send_file(func):
     # отправка файла на сервер
     def send_file(file_name:str):
 
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         result = None
 
-        try:
-            client_socket.connect((IP, PORT))
-            file = open(file_name, 'rb')
+        client_socket.connect((IP, PORT))
+        file = open(file_name, 'rb')
 
-            file_line = file.read()
+        file_line = file.read()
 
-            # отправляем пакет данных
-            client_socket.sendall(file_line)
+        # отправляем пакет данных
+        client_socket.sendall(file_line)
 
-            # очищаем клиента от лишних данных
-            file.close()
-            os.remove(f"/{file_name}")
-            os.remove(f"/{file_name}")
+        # очищаем клиента от лишних данных
+        file.close()
+        os.remove(os.path.abspath(f"{file_name}"))
+        # os.remove(os.path.abspath(f"{file_name}"))
 
-            # Принимаем ответ от сервера
-            data = client_socket.recv(SOCKET_SPEED)
-            result = data
+        # Принимаем ответ от сервера
+        # data = client_socket.recv(SOCKET_SPEED)
+        # result = data
 
-            while not data:
-                result += data
+        # while not data:
+        #     result += data
 
-            return result.decode()
+        # return result.decode()
+        client_socket.close()
+        return 1
 
-        except:
-            print("ERROR CONNECT")
 
 
     # получить результат
@@ -94,9 +97,10 @@ def save_send_file(func):
             send_file(f"value{i}.txt")
 
 
-        result = get_result()
-        print(COUNT_TASKS)
-        return result
+        # result = get_result()
+        print("-"*10)
+        print(f"Количество задействованных серверов: {COUNT_TASKS}")
+        return 1
 
     return run
 
