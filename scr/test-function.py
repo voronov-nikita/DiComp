@@ -3,8 +3,8 @@ from client import save_send_file
 
 @save_send_file
 def one():
-    print(1)
-    return 1
+    print(2)
+    return 2
 
 
 # @save_send_file

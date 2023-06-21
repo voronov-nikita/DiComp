@@ -32,11 +32,8 @@ def save_send_file(func):
         # запись задачи
         with open(f"task{COUNT_TASKS}.txt", "w") as file:
             file.write(source_code[LEN_NAME_DECORATOR:])
-            for line in source_code:
-                print(line)
-                if 'def' in line:
-                    function_name = line[5:-1]
-                    file.write(function_name)
+            function_name = source_code.split('\n')[1][4:-1]
+            file.write(function_name)
         
         # соответсвующие значения для функций
         with open(f"value{COUNT_TASKS}.txt", "w") as file:

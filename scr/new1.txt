@@ -1,3 +1,0 @@
-def one():
-    print(1)
-    return 1
