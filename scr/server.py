@@ -5,7 +5,6 @@
 
 import socket
 import subprocess
-import sys
 from threading import Thread
 
 
@@ -24,11 +23,14 @@ class NewThread(Thread):
 def write_task(number:int, data:bytes):
     with open(f"new{number}.txt", 'wb') as file:
         file.write(data)
+        
 
 
-def doind_task(file_name:str):
-    subprocess.run(["python", file_name])
-    print(sys.__stdout__)
+# выполняет задачу и возвращает данные в байтовом формате
+def doind_task(file_name:str) -> bytes:
+    output = subprocess.check_output(['python', file_name])
+    print(output)
+    return output
 
 
 def run_server():
@@ -58,7 +60,8 @@ def run_server():
                 break
 
         write_task(count_connect, file_data)
-        doind_task(f"new{count_connect}.txt")
+        res = doind_task(f"new{count_connect}.txt")
+        client.sendall(res)
 
 
 

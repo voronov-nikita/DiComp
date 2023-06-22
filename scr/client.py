@@ -32,6 +32,11 @@ def save_send_file(func):
         # запись задачи
         with open(f"task{COUNT_TASKS}.txt", "w") as file:
             file.write(source_code[LEN_NAME_DECORATOR:])
+            for line in source_code:
+                print(line)
+                if 'def' in line:
+                    function_name = line[5:-1]
+                    file.write(function_name)
         
         # соответсвующие значения для функций
         with open(f"value{COUNT_TASKS}.txt", "w") as file:
@@ -45,11 +50,11 @@ def save_send_file(func):
     # отправка файла на сервер
     def send_file(file_name:str):
 
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         result = None
 
-        client_socket.connect((IP, PORT))
+        
         file = open(file_name, 'rb')
 
         file_line = file.read()
@@ -60,18 +65,8 @@ def save_send_file(func):
         # очищаем клиента от лишних данных
         file.close()
         os.remove(os.path.abspath(f"{file_name}"))
-        # os.remove(os.path.abspath(f"{file_name}"))
-
-        # Принимаем ответ от сервера
-        # data = client_socket.recv(SOCKET_SPEED)
-        # result = data
-
-        # while not data:
-        #     result += data
-
-        # return result.decode()
-        client_socket.close()
-        return 1
+        
+        # client_socket.close()
 
 
 
@@ -79,6 +74,7 @@ def save_send_file(func):
     # здесь мы будем ждать сообщение от сервера до тех пор, пока оно не придет
     def get_result():
         result = None
+        
         while True:
             result_data = client_socket.recv(SOCKET_SPEED)
             if result_data:
@@ -90,6 +86,7 @@ def save_send_file(func):
 
     # запуск всех состовляющих
     def run(*args, **kwargs):
+        client_socket.connect((IP, PORT))
         wrapper(*args, **kwargs)
 
         for i in range(COUNT_TASKS):
@@ -97,10 +94,10 @@ def save_send_file(func):
             send_file(f"value{i}.txt")
 
 
-        # result = get_result()
+        result = get_result()
         print("-"*10)
         print(f"Количество задействованных серверов: {COUNT_TASKS}")
-        return 1
+        return result
 
     return run
 
