@@ -1,0 +1,3 @@
+def one(n):
+    return n
+print(one(n1))

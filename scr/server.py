@@ -6,9 +6,10 @@
 import socket
 import subprocess
 from threading import Thread
+import os
 
 
-IP:str = "192.168.8.102"
+IP:str = "192.168.8.104"
 PORT:int = 12345
 
 SOCKET_SPEED:int = 4096
@@ -62,7 +63,9 @@ def run_server():
         write_task(count_connect, file_data)
         res = doind_task(f"new{count_connect}.txt")
         client.sendall(res)
-
+        os.remove(os.path.abspath(f"new{count_connect}.txt"))
+        count_connect -= 1
+        
 
 
 if __name__=="__main__":

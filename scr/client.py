@@ -14,7 +14,7 @@ COUNT_TASKS:int = 0
 LEN_NAME_DECORATOR:int = len("@save_send_file ")
 SOCKET_SPEED:int = 4096
 
-IP:str = "192.168.8.102"
+IP:str = "192.168.8.104"
 PORT:int = 12345
 
 
@@ -32,8 +32,12 @@ def save_send_file(func):
         # запись задачи
         with open(f"task{COUNT_TASKS}.txt", "w") as file:
             file.write(source_code[LEN_NAME_DECORATOR:])
-            function_name = source_code.split('\n')[1][4:-1]
-            file.write(function_name)
+            line = source_code.split('\n')[1]
+            function_name = line[4:line.index(":")]
+            print(function_name)
+            if len(args) != 0:
+                function_name = function_name[:line.index("("):line.index(")")+1]
+            file.write(f"print({function_name})")
         
         # соответсвующие значения для функций
         with open(f"value{COUNT_TASKS}.txt", "w") as file:
