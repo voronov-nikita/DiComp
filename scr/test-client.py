@@ -1,9 +1,9 @@
 from new import dec
 
 @dec
-def go():
+def go(a, b):
     return True
 
 
-print(go(10))
+print(go(b=10, a=100))
 

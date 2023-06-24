@@ -29,21 +29,30 @@ def save_send_file(func):
         # Получение исходного кода функции
         source_code = inspect.getsource(func)
 
-        # запись задачи
+        # запись задачи 
         with open(f"task{COUNT_TASKS}.txt", "w") as file:
             file.write(source_code[LEN_NAME_DECORATOR:])
             line = source_code.split('\n')[1]
             function_name = line[4:line.index(":")]
+            # если аргументы к функции есть, то
+            # преобразовываем имя так, чтобы оно соответствовало
+            # ?!?!?!?!?!?!?!?!?!?!?!?!?!?!?
+            if len(kwargs) != 0:
+                time_name = function_name[function_name.index("(")+1:]
+                for key, values in kwargs.items():
+                    time_name = time_name.replace(key, values)
+                print(time_name)
+                function_name += time_name
+
+            # \/\/\//\/\/\/\/\//\/\/\/\/\//\/\/\/\//\/\/\/\/\/\/\/\/
+            elif len(args) != 0:
+                function_name = function_name[:function_name.index("(")+1]
+                print(function_name)
+                function_name += str(args)[1:-1] + ")"
+
             print(function_name)
-            if len(args) != 0:
-                function_name = function_name[:line.index("("):line.index(")")+1]
             file.write(f"print({function_name})")
         
-        # соответсвующие значения для функций
-        with open(f"value{COUNT_TASKS}.txt", "w") as file:
-            for elem in args:
-                file.write(str(elem))
-                file.write("\n")
 
         COUNT_TASKS+=1
 
@@ -55,7 +64,6 @@ def save_send_file(func):
 
         result = None
 
-        
         file = open(file_name, 'rb')
 
         file_line = file.read()
@@ -92,7 +100,6 @@ def save_send_file(func):
 
         for i in range(COUNT_TASKS):
             send_file(f"task{i}.txt")
-            send_file(f"value{i}.txt")
 
 
         result = get_result()
