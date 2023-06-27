@@ -34,24 +34,23 @@ def save_send_file(func):
             file.write(source_code[LEN_NAME_DECORATOR:])
             line = source_code.split('\n')[1]
             function_name = line[4:line.index(":")]
+            
             # если аргументы к функции есть, то
             # преобразовываем имя так, чтобы оно соответствовало
-            # ?!?!?!?!?!?!?!?!?!?!?!?!?!?!?
             if len(kwargs) != 0:
-                time_name = function_name[function_name.index("(")+1:]
-                for key, values in kwargs.items():
-                    time_name = time_name.replace(key, values)
-                print(time_name)
-                function_name += time_name
+                function_name = function_name[function_name.index("(")+1:]
+                for key, value in kwargs.items():
+                    if type(value) == str:
+                        function_name = function_name.replace(key, f"'{value}'")
+                    else:
+                        function_name = function_name.replace(key, str(value))
 
-            # \/\/\//\/\/\/\/\//\/\/\/\/\//\/\/\/\//\/\/\/\/\/\/\/\/
+
             elif len(args) != 0:
                 function_name = function_name[:function_name.index("(")+1]
-                print(function_name)
-                function_name += str(args)[1:-1] + ")"
+                function_name += str(args)[1:-1] + "))"
 
-            print(function_name)
-            file.write(f"print({function_name})")
+            file.write(f"print({function_name}")
         
 
         COUNT_TASKS+=1
