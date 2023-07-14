@@ -13,7 +13,7 @@ IP:str = "192.168.8.104"
 PORT:int = 12345
 
 SOCKET_SPEED:int = 4096
-COUNT_CONNECT:int = 0
+
 
 
 class NewThread(Thread):
@@ -32,49 +32,55 @@ class NewThread(Thread):
             if file_data:
                 break
 
-        write_task(COUNT_CONNECT, file_data)
-        res = doind_task(f"new{COUNT_CONNECT}.txt")
+        write_task(self.count_connect, file_data)
+        res = doind_task(f"new{self.count_connect}.txt")
         self.client_socket.sendall(res)
-        os.remove(os.path.abspath(f"new{COUNT_CONNECT}.txt"))
+        os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
         # COUNT_CONNECT -= 1
 
 
-# сделать запись с полученными данными
-def write_task(number:int, data:bytes):
-    with open(f"new{number}.txt", 'wb') as file:
-        file.write(data)
-        
+
+class Server():
+    def __init__(self, IP:str, PORT:int):
+        self.count_connect = 0
+        self.IP = IP
+        self.PORT = PORT
+
+    # сделать запись с полученными данными
+    def write_task(self, number:int, data:bytes):
+        with open(f"new{number}.txt", 'wb') as file:
+            file.write(data)
+            
 
 
-# выполняет задачу и возвращает данные в байтовом формате
-def doind_task(file_name:str) -> bytes:
-    output = subprocess.check_output(['python', file_name])
-    print(output)
-    return output
+    # выполняет задачу и возвращает данные в байтовом формате
+    def doind_task(self, file_name:str) -> bytes:
+        output = subprocess.check_output(['python', file_name])
+        print(output)
+        return output
 
 
 
-def run_server():
-    global COUNT_CONNECT
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((IP, PORT))
-    server_socket.listen()
+    def run_server(self):
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind((self.IP, self.PORT))
+        server_socket.listen()
 
-    
 
-    print("<" + "--"*10 + ">")
+        print("<" + "--"*10 + ">")
 
-    while True:
-        # принимаем подключения
-        client, adress = server_socket.accept()
+        while True:
+            # принимаем подключения
+            client, adress = server_socket.accept()
 
-        COUNT_CONNECT += 1
+            self.count_connect += 1
 
-        print(*adress)
-        
-        new_client = NewThread(client)
-        new_client.start()
+            print(*adress)
+            
+            new_client = NewThread(client)
+            new_client.start()
     
         
 if __name__=="__main__":
-    run_server()
+    server = Server(IP, PORT)
+    server.run_server()
