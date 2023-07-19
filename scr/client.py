@@ -14,13 +14,17 @@ COUNT_TASKS:int = 0
 LEN_NAME_DECORATOR:int = len("@save_send_file ")
 SOCKET_SPEED:int = 4096
 
-IP:str = "192.168.8.104"
-PORT:int = 12345
+IP=""
+PORT=0
 
+
+def init(ip:str, port:int):
+    global IP, PORT
+    IP=ip
+    PORT=port
 
 
 def save_send_file(func):
-
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # подготовка файлов для сервера
@@ -33,6 +37,7 @@ def save_send_file(func):
         with open(f"task{COUNT_TASKS}.txt", "w") as file:
             file.write(source_code[LEN_NAME_DECORATOR:])
             line = source_code.split('\n')[1]
+            new_function_name = line[4:line.index(":")]
             function_name = line[4:line.index(":")]
             
             # если аргументы к функции есть, то
@@ -49,8 +54,9 @@ def save_send_file(func):
             elif len(args) != 0:
                 function_name = function_name[:function_name.index("(")+1]
                 function_name += str(args)[1:-1] + "))"
-
-            file.write(f"print({function_name}")
+            
+            finally_name = new_function_name[:new_function_name.index("(")+1] + function_name 
+            file.write(f"print({finally_name})")
         
 
         COUNT_TASKS+=1
