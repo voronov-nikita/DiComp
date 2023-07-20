@@ -22,16 +22,15 @@ class Xsay():
     def __init__(self):
         self.IP:str = ""
         self.PORT:int = 0
+        self.other_functions:list = []
     
     # функция для подключения к серверу
     def connect_server(self, ip:str, port:int):
         self.IP=ip
         self.PORT=port
         
-    def add_function(*args):
-        
-        for i in range(1, len(args)):
-            print(args[i])
+    def add_function(self, *args):
+        self.other_functions = args
 
     # функция-декоратор для отправки файла на сервер и возвращению результата
     def send_file(self, func):
@@ -76,8 +75,7 @@ class Xsay():
 
         # отправка файла на сервер
         def send_file(file_name:str):
-
-            # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            
 
             result = None
 

@@ -3,7 +3,7 @@ import numpy as np
 
 server = Xsay()
 
-server.connect_server(ip="192.168.8.101", port=12345)
+server.connect_server(ip="10.0.0.28", port=12345)
 server.add_function(np.array, np.sin, np.cos)
 
 
