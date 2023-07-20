@@ -11,106 +11,118 @@ import os
 
 
 COUNT_TASKS:int = 0
-LEN_NAME_DECORATOR:int = len("@save_send_file ")
 SOCKET_SPEED:int = 4096
 
-IP=""
-PORT=0
+IP:str=""
+PORT:int=0
 
 
-def init(ip:str, port:int):
-    global IP, PORT
-    IP=ip
-    PORT=port
+class Xsay():
+    
+    def __init__(self):
+        self.IP:str = ""
+        self.PORT:int = 0
+    
+    # функция для подключения к серверу
+    def connect_server(self, ip:str, port:int):
+        self.IP=ip
+        self.PORT=port
+        
+    def add_function(*args):
+        
+        for i in range(1, len(args)):
+            print(args[i])
 
+    # функция-декоратор для отправки файла на сервер и возвращению результата
+    def send_file(self, func):
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def save_send_file(func):
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    # подготовка файлов для сервера
-    def wrapper(*args, **kwargs):
-        global COUNT_TASKS
-        # Получение исходного кода функции
-        source_code = inspect.getsource(func)
-
-        # запись задачи 
-        with open(f"task{COUNT_TASKS}.txt", "w") as file:
-            file.write(source_code[LEN_NAME_DECORATOR:])
-            line = source_code.split('\n')[1]
-            new_function_name = line[4:line.index(":")]
-            function_name = line[4:line.index(":")]
+        # подготовка файлов для сервера
+        def wrapper(*args, **kwargs):
+            global COUNT_TASKS
+            # Получение исходного кода функции
+            source_code = inspect.getsource(func)
             
-            # если аргументы к функции есть, то
-            # преобразовываем имя так, чтобы оно соответствовало
-            if len(kwargs) != 0:
-                function_name = function_name[function_name.index("(")+1:]
-                for key, value in kwargs.items():
-                    if type(value) == str:
-                        function_name = function_name.replace(key, f"'{value}'")
-                    else:
-                        function_name = function_name.replace(key, str(value))
+            LEN_NAME_DECORATE:int = len(source_code[source_code.index("@"):source_code.index("def")])
+
+            # запись задачи 
+            with open(f"task{COUNT_TASKS}.txt", "w") as file:
+                file.write(source_code[LEN_NAME_DECORATE:])
+                line = source_code.split('\n')[1]
+                new_function_name = line[4:line.index(":")]
+                function_name = line[4:line.index(":")]
+                
+                # если аргументы к функции есть, то
+                # преобразовываем имя так, чтобы оно соответствовало
+                if len(kwargs) != 0:
+                    function_name = function_name[function_name.index("(")+1:]
+                    for key, value in kwargs.items():
+                        if type(value) == str:
+                            function_name = function_name.replace(key, f"'{value}'")
+                        else:
+                            function_name = function_name.replace(key, str(value))
 
 
-            elif len(args) != 0:
-                function_name = function_name[:function_name.index("(")+1]
-                function_name += str(args)[1:-1] + "))"
+                elif len(args) != 0:
+                    function_name = function_name[:function_name.index("(")+1]
+                    function_name += str(args)[1:-1] + "))"
+                
+                finally_name = new_function_name[:new_function_name.index("(")+1] + function_name 
+                file.write(f"print({finally_name})")
             
-            finally_name = new_function_name[:new_function_name.index("(")+1] + function_name 
-            file.write(f"print({finally_name})")
-        
 
-        COUNT_TASKS+=1
+            COUNT_TASKS+=1
 
 
-    # отправка файла на сервер
-    def send_file(file_name:str):
+        # отправка файла на сервер
+        def send_file(file_name:str):
 
-        # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        result = None
+            result = None
 
-        file = open(file_name, 'rb')
+            file = open(file_name, 'rb')
 
-        file_line = file.read()
+            file_line = file.read()
 
-        # отправляем пакет данных
-        client_socket.sendall(file_line)
+            # отправляем пакет данных
+            client_socket.sendall(file_line)
 
-        # очищаем клиента от лишних данных
-        file.close()
-        os.remove(os.path.abspath(f"{file_name}"))
-        
-        # client_socket.close()
+            # очищаем клиента от лишних данных
+            file.close()
+            os.remove(os.path.abspath(f"{file_name}"))
+            
+            # client_socket.close()
 
 
 
-    # получить результат
-    # здесь мы будем ждать сообщение от сервера до тех пор, пока оно не придет
-    def get_result():
-        result = None
-        
-        while True:
-            result_data = client_socket.recv(SOCKET_SPEED)
-            if result_data:
-                result = result_data.decode()
-                break
+        # получить результат
+        # здесь мы будем ждать сообщение от сервера до тех пор, пока оно не придет
+        def get_result():
+            result = None
+            
+            while True:
+                result_data = client_socket.recv(SOCKET_SPEED)
+                if result_data:
+                    result = result_data.decode()
+                    break
 
-        return result
-
-
-    # запуск всех состовляющих
-    def run(*args, **kwargs):
-        client_socket.connect((IP, PORT))
-        wrapper(*args, **kwargs)
-
-        for i in range(COUNT_TASKS):
-            send_file(f"task{i}.txt")
+            return result
 
 
-        result = get_result()
-        print("-"*10)
-        print(f"Количество задействованных серверов: {COUNT_TASKS}")
-        return result
+        # запуск всех состовляющих
+        def run(*args, **kwargs):
+            client_socket.connect((self.IP, self.PORT))
+            wrapper(*args, **kwargs)
 
-    return run
+            for i in range(COUNT_TASKS):
+                send_file(f"task{i}.txt")
+
+
+            result = get_result()
+            print("-"*10)
+            print(f"Количество задействованных серверов: {COUNT_TASKS}")
+            return result
+
+        return run
 

@@ -1,9 +1,14 @@
-from client import save_send_file, init
+from client import Xsay
+import numpy as np
+
+server = Xsay()
+
+server.connect_server(ip="192.168.8.101", port=12345)
+server.add_function(np.array, np.sin, np.cos)
 
 
-init(ip="192.168.8.101", port=12345)
 
-@save_send_file
+@server.send_file
 def one(n, b):
     return n + b
 

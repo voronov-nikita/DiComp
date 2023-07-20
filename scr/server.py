@@ -48,7 +48,7 @@ class NewThread(Thread):
         self.write_task(self.count_connect, file_data)
         res = self.doind_task(f"new{self.count_connect}.txt")
         self.client_socket.sendall(res)
-        # os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
+        os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
 
         return 0
 
@@ -68,7 +68,7 @@ class Server():
 
 
         print("<" + "--"*10 + ">")
-        print(f"SERVER IS RUN...\nIP:{self.IP}\nPORT:{self.PORT}")
+        print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}")
 
         while True:
             # принимаем подключения
