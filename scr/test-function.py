@@ -1,4 +1,4 @@
-from multiprocessing import Process
+import multiprocessing
 from time import time
 
 
@@ -20,12 +20,24 @@ def f2():
     print(k)
 
 
+def run_process(func):
+    return func()
+
 if __name__ == '__main__':
     start = time()
     ls = [f, f2]
     print(ls)
-    for i in ls:
-        p = Process(target=i)
-        p.start()
-        p.join()
+    
+    # Количество процессов, которые будут использованы
+    num_processes = multiprocessing.cpu_count()
+
+    # Создаем пул процессов
+    pool = multiprocessing.Pool(processes=num_processes)
+    
+    processed_array = pool.map(run_process, ls)
+
+    # Закрываем пул процессов
+    pool.close()
+    pool.join()
+    
     print(time() - start)
