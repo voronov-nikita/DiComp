@@ -1,25 +1,31 @@
-from client import Xsay
-import numpy as np
-
-server = Xsay()
-
-server.connect_server(ip="10.0.0.28", port=12345)
-server.add_function(np.array, np.sin, np.cos)
+from multiprocessing import Process
+from time import time
 
 
+def f():
+    k=0
+    for i in range(1000):
+        for g in range(1000):
+            for x in range(5):
+                k +=  i*g*x
+    print(k)
+    
 
-@server.send_file
-def one(n, b):
-    return n + b
+def f2():
+    k=0
+    for i in range(1000):
+        for g in range(1000):
+            for x in range(5):
+                k +=  i*g*x
+    print(k)
 
 
-# @save_send_file
-def two():
-    return 2
-
-
-def five():
-    return 5
-
-print(one(b=10, n=50))
-# print(two())
+if __name__ == '__main__':
+    start = time()
+    ls = [f, f2]
+    print(ls)
+    for i in ls:
+        p = Process(target=i)
+        p.start()
+        p.join()
+    print(time() - start)
