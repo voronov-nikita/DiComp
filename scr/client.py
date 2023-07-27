@@ -7,6 +7,7 @@
 import inspect
 import socket
 import threading
+import multiprocessing
 import os
 
 
@@ -24,6 +25,7 @@ class Xsay():
         self.PORT:int = 0
         self.other_functions:list = []
       
+    # NOT WORKED!!!
     def add_function(self, *args):
         self.other_functions = args
 
@@ -43,9 +45,10 @@ class Xsay():
                 # запись задачи 
                 with open(f"task{COUNT_TASKS}.txt", "w") as file:
                     file.write(source_code[LEN_NAME_DECORATE:])
+                    
                     line = source_code.split('\n')[1]
-                    new_function_name = line[4:line.index(":")]
-                    function_name = line[4:line.index(":")]
+                    new_function_name:str = line[4:line.index(":")]
+                    function_name:str = line[4:line.index(":")]
                     
                     # если аргументы к функции есть, то
                     # преобразовываем имя так, чтобы оно соответствовало
@@ -57,22 +60,25 @@ class Xsay():
                             else:
                                 function_name = function_name.replace(key, str(value))
 
-
-                    elif len(args) != 0:
-                        function_name = function_name[:function_name.index("(")+1]
-                        function_name += str(args)[1:-1] + "))"
+                    if len(args) != 0:
+                        time_function_name:str = function_name[function_name.index("(")+1:]
+                        for number, argument in enumerate(args):
+                            time_function_name = time_function_name.replace(time_function_name[number], str(argument), 1)
+                        finally_name:str = function_name[:function_name.index("(")+1] + time_function_name
                     
-                    finally_name = new_function_name[:new_function_name.index("(")+1] + function_name 
+                    else:
+                        finally_name:str = function_name
+                        
+                    print(finally_name)
                     file.write(f"print({finally_name})")
                 
 
-                COUNT_TASKS+=1
+                COUNT_TASKS += 1
 
 
             # отправка файла на сервер
             def send_files(file_name:str):
                 
-
                 result = None
 
                 file = open(file_name, 'rb')
@@ -84,7 +90,6 @@ class Xsay():
 
                 # очищаем клиента от лишних данных
                 file.close()
-                os.remove(os.path.abspath(f"{file_name}"))
 
 
             # получить результат
@@ -104,15 +109,19 @@ class Xsay():
             # запуск всех состовляющих
             def run(*args, **kwargs):
                 client_socket.connect((ip, port))
+                
                 wrapper(*args, **kwargs)
 
                 for i in range(COUNT_TASKS):
                     send_files(f"task{i}.txt")
+                
+                # for i in range(COUNT_TASKS):
+                #     os.remove(os.path.abspath(f"task{i}.txt"))
 
 
                 result = get_result()
                 print("-"*10)
-                print(f"Количество задействованных серверов: {COUNT_TASKS}")
+                print(f"Количество задействованных задач: {COUNT_TASKS}")
                 return result
 
             return run

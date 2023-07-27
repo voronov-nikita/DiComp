@@ -5,22 +5,22 @@
 
 import socket
 import subprocess
-from threading import Thread
+import multiprocessing
 import os
 
 
-IP:str = "192.168.8.101"
+IP:str = "192.168.8.100"
 PORT:int = 12345
 
 SOCKET_SPEED:int = 4096
 
 
+COUNT_CONNECT:int = 0
 
-class NewThread(Thread):
-    def __init__(self, client_socket, count_connect:int):
-        Thread.__init__(self)
+
+class Commands():
+    def __init__(self, client_socket):
         self.client_socket = client_socket
-        self.count_connect = count_connect
 
     # сделать запись с полученными данными
     def write_task(self, number:int, data:bytes):
@@ -36,6 +36,7 @@ class NewThread(Thread):
 
 
     def run(self):
+        global COUNT_CONNECT
         while True:
             # принимаем данные от клиента
             data = self.client_socket.recv(SOCKET_SPEED)
@@ -45,18 +46,16 @@ class NewThread(Thread):
             if file_data:
                 break
 
-        self.write_task(self.count_connect, file_data)
-        res = self.doind_task(f"new{self.count_connect}.txt")
+        self.write_task(COUNT_CONNECT, file_data)
+        res = self.doind_task(f"new{COUNT_CONNECT}.txt")
         self.client_socket.sendall(res)
-        os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
-
-        return 0
+        os.remove(os.path.abspath(f"new{COUNT_CONNECT}.txt"))
+        # COUNT_CONNECT -= 1
 
 
 
 class Server():
     def __init__(self, IP:str, PORT:int):
-        self.count_connect = 0
         self.IP = IP
         self.PORT = PORT
 
@@ -73,13 +72,17 @@ class Server():
         while True:
             # принимаем подключения
             client, adress = server_socket.accept()
+            
+            global COUNT_CONNECT
 
-            self.count_connect += 1
+            COUNT_CONNECT += 1
 
             print(*adress)
             
-            new_client = NewThread(client_socket=client, count_connect=self.count_connect)
-            new_client.start()
+            new_connect = Commands(client_socket=client)
+            
+            process = multiprocessing.Process(target=new_connect.run())
+            process.start()
     
         
 if __name__=="__main__":
