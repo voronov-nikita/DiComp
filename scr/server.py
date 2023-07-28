@@ -5,7 +5,7 @@
 
 import socket
 import subprocess
-import multiprocessing
+from threading import Thread
 import os
 
 
@@ -18,9 +18,11 @@ SOCKET_SPEED:int = 4096
 COUNT_CONNECT:int = 0
 
 
-class Commands():
-    def __init__(self, client_socket):
+class NewThread(Thread):
+    def __init__(self, client_socket, count_connect:int):
+        Thread.__init__(self)
         self.client_socket = client_socket
+        self.count_connect:int = count_connect
 
     # сделать запись с полученными данными
     def write_task(self, number:int, data:bytes):
@@ -36,7 +38,6 @@ class Commands():
 
 
     def run(self):
-        global COUNT_CONNECT
         while True:
             # принимаем данные от клиента
             data = self.client_socket.recv(SOCKET_SPEED)
@@ -46,11 +47,10 @@ class Commands():
             if file_data:
                 break
 
-        self.write_task(COUNT_CONNECT, file_data)
-        res = self.doind_task(f"new{COUNT_CONNECT}.txt")
+        self.write_task(self.count_connect, file_data)
+        res = self.doind_task(f"new{self.count_connect}.txt")
         self.client_socket.sendall(res)
-        os.remove(os.path.abspath(f"new{COUNT_CONNECT}.txt"))
-        # COUNT_CONNECT -= 1
+        os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
 
 
 
@@ -79,10 +79,8 @@ class Server():
 
             print(*adress)
             
-            new_connect = Commands(client_socket=client)
-            
-            process = multiprocessing.Process(target=new_connect.run())
-            process.start()
+            new_connect = NewThread(client_socket=client, count_connect=COUNT_CONNECT)
+            new_connect.start()
     
         
 if __name__=="__main__":

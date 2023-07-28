@@ -7,7 +7,6 @@
 import inspect
 import socket
 import threading
-import multiprocessing
 import os
 
 
@@ -61,19 +60,15 @@ class Xsay():
                                 function_name = function_name.replace(key, str(value))
 
                     if len(args) != 0:
-                        time_function_name:str = function_name[function_name.index("(")+1:]
-                        for number, argument in enumerate(args):
-                            time_function_name = time_function_name.replace(time_function_name[number], str(argument), 1)
-                        finally_name:str = function_name[:function_name.index("(")+1] + time_function_name
+                        time_function_name:str = function_name[:function_name.index("(")+1]
+                        time_function_name += str(*args) + ")"
+                        finally_name:str = time_function_name
                     
                     else:
                         finally_name:str = function_name
                         
-                    print(finally_name)
                     file.write(f"print({finally_name})")
                 
-
-                COUNT_TASKS += 1
 
 
             # отправка файла на сервер
@@ -90,6 +85,7 @@ class Xsay():
 
                 # очищаем клиента от лишних данных
                 file.close()
+                os.remove(os.path.abspath(f"{file_name}"))
 
 
             # получить результат
@@ -112,16 +108,10 @@ class Xsay():
                 
                 wrapper(*args, **kwargs)
 
-                for i in range(COUNT_TASKS):
-                    send_files(f"task{i}.txt")
-                
-                # for i in range(COUNT_TASKS):
-                #     os.remove(os.path.abspath(f"task{i}.txt"))
+                send_files(f"task{COUNT_TASKS}.txt")
 
 
                 result = get_result()
-                print("-"*10)
-                print(f"Количество задействованных задач: {COUNT_TASKS}")
                 return result
 
             return run

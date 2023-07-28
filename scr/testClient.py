@@ -1,5 +1,5 @@
 from client import Xsay
-
+from time import time
 
 server = Xsay()
 
@@ -15,14 +15,15 @@ def one(a):
 
 
 @server.send_file(ip="192.168.8.100", port=12345)
-def two():
+def two(a):
     k=0
     for i in range(1000):
         for g in range(1000):
-            for x in range(5):
+            for x in range(a):
                 k += i*g*x
     return k
 
-
+start = time()
 print(one(5))
 print(two(5))
+print(time() - start)
