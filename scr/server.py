@@ -9,7 +9,7 @@ from threading import Thread
 import os
 
 
-IP:str = "192.168.8.100"
+IP:str = socket.gethostbyname(socket.gethostname())
 PORT:int = 12345
 
 SOCKET_SPEED:int = 4096
@@ -32,9 +32,12 @@ class NewThread(Thread):
 
     # выполняет задачу и возвращает данные в байтовом формате
     def doind_task(self, file_name:str) -> bytes:
-        output = subprocess.check_output(['python', file_name])
-        print(output)
-        return output
+        try:
+            output = subprocess.check_output(['pypy', file_name])
+        except:
+            output = subprocess.check_output(['python', file_name])
+        print("OUT:", output[:-4], "\n")
+        return output[:-4]
 
 
     def run(self):
@@ -51,6 +54,7 @@ class NewThread(Thread):
         res = self.doind_task(f"new{self.count_connect}.txt")
         self.client_socket.sendall(res)
         os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
+        self.client_socket.close()
 
 
 
@@ -77,7 +81,7 @@ class Server():
 
             COUNT_CONNECT += 1
 
-            print(*adress)
+            print(adress[0]+":"+adress[1])
             
             new_connect = NewThread(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()

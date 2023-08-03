@@ -112,6 +112,7 @@ class Xsay():
 
 
                 result = get_result()
+                client_socket.close()
                 return result
 
             return run

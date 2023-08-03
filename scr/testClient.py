@@ -4,7 +4,7 @@ from time import time
 server = Xsay()
 
 
-@server.send_file(ip="192.168.8.100", port=12345)
+@server.send_file(ip="192.168.8.104", port=12345)
 def one(a):
     k=0
     for i in range(1000):
@@ -14,7 +14,7 @@ def one(a):
     return k
 
 
-@server.send_file(ip="192.168.8.100", port=12345)
+@server.send_file(ip="192.168.8.104", port=12345)
 def two(a):
     k=0
     for i in range(1000):
