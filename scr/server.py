@@ -16,6 +16,7 @@ SOCKET_SPEED:int = 4096
 
 
 COUNT_CONNECT:int = 0
+USING_PYPY:bool = True
 
 
 class NewThread(Thread):
@@ -31,10 +32,10 @@ class NewThread(Thread):
 
 
     # выполняет задачу и возвращает данные в байтовом формате
-    def doind_task(self, file_name:str) -> bytes:
-        try:
+    def doind_task(self, file_name:str, isPypy:bool=False) -> bytes:
+        if isPypy:
             output = subprocess.check_output(['pypy', file_name])
-        except:
+        else:
             output = subprocess.check_output(['python', file_name])
         print("OUT:", output[:-4], "\n")
         return output[:-4]
@@ -51,7 +52,7 @@ class NewThread(Thread):
                 break
 
         self.write_task(self.count_connect, file_data)
-        res = self.doind_task(f"new{self.count_connect}.txt")
+        res = self.doind_task(f"new{self.count_connect}.txt", isPypy=USING_PYPY)
         self.client_socket.sendall(res)
         os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
         self.client_socket.close()
@@ -71,7 +72,7 @@ class Server():
 
 
         print("<" + "--"*10 + ">")
-        print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}")
+        print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}\n")
 
         while True:
             # принимаем подключения
@@ -81,7 +82,7 @@ class Server():
 
             COUNT_CONNECT += 1
 
-            print(adress[0]+":"+adress[1])
+            print(*adress)
             
             new_connect = NewThread(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()

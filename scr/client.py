@@ -22,16 +22,17 @@ class Xsay():
     def __init__(self):
         self.IP:str = ""
         self.PORT:int = 0
-        self.other_functions:list = []
+        # self.other_functions:list = []
       
-    # NOT WORKED!!!
-    def add_function(self, *args):
-        self.other_functions = args
+      
+    # # NOT WORKED!!!
+    # def add_function(self, *args):
+    #     self.other_functions = args
+
 
     # функция-декоратор для отправки файла на сервер и возвращению результата
-    def send_file(self, ip:str, port:int):
+    def calculate(self, ip:str, port:int) -> str:
         def new_send_file(func):
-            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
             # подготовка файлов для сервера
             def wrapper(*args, **kwargs):
@@ -72,7 +73,7 @@ class Xsay():
 
 
             # отправка файла на сервер
-            def send_files(file_name:str):
+            def send_files(file_name:str, client_socket):
                 
                 result = None
 
@@ -90,7 +91,7 @@ class Xsay():
 
             # получить результат
             # здесь мы будем ждать сообщение от сервера до тех пор, пока оно не придет
-            def get_result():
+            def get_result(client_socket):
                 result = None
                 
                 while True:
@@ -104,14 +105,15 @@ class Xsay():
 
             # запуск всех состовляющих
             def run(*args, **kwargs):
+                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 client_socket.connect((ip, port))
                 
                 wrapper(*args, **kwargs)
 
-                send_files(f"task{COUNT_TASKS}.txt")
+                send_files(f"task{COUNT_TASKS}.txt", client_socket=client_socket)
 
 
-                result = get_result()
+                result = get_result(client_socket=client_socket)
                 client_socket.close()
                 return result
 
