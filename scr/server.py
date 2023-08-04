@@ -12,9 +12,8 @@ import os
 IP:str = socket.gethostbyname(socket.gethostname())
 PORT:int = 12345
 
+
 SOCKET_SPEED:int = 4096
-
-
 COUNT_CONNECT:int = 0
 USING_PYPY:bool = True
 
@@ -26,7 +25,7 @@ class NewThread(Thread):
         self.count_connect:int = count_connect
 
     # сделать запись с полученными данными
-    def write_task(self, number:int, data:bytes):
+    def write_task(self, number:int, data:bytes) -> None:
         with open(f"new{number}.txt", 'wb') as file:
             file.write(data)
 
@@ -34,14 +33,14 @@ class NewThread(Thread):
     # выполняет задачу и возвращает данные в байтовом формате
     def doind_task(self, file_name:str, isPypy:bool=False) -> bytes:
         if isPypy:
-            output = subprocess.check_output(['pypy', file_name])
+            output = subprocess.check_output(['pypy', file_name]).decode()
         else:
-            output = subprocess.check_output(['python', file_name])
-        print("OUT:", output[:-4], "\n")
-        return output[:-4]
+            output = subprocess.check_output(['python', file_name]).decode()
+        print("OUT:", output.encode()[:-2], "\n")
+        return output.encode()[:-2]
 
 
-    def run(self):
+    def run(self) -> None:
         while True:
             # принимаем данные от клиента
             data = self.client_socket.recv(SOCKET_SPEED)
@@ -86,6 +85,7 @@ class Server():
             
             new_connect = NewThread(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()
+            new_connect.join()
     
         
 if __name__=="__main__":

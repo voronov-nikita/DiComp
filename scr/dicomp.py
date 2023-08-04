@@ -17,17 +17,11 @@ IP:str=""
 PORT:int=0
 
 
-class Xsay():
+class Dicomp():
     
     def __init__(self):
         self.IP:str = ""
         self.PORT:int = 0
-        # self.other_functions:list = []
-      
-      
-    # # NOT WORKED!!!
-    # def add_function(self, *args):
-    #     self.other_functions = args
 
 
     # функция-декоратор для отправки файла на сервер и возвращению результата
