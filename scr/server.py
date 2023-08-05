@@ -18,7 +18,7 @@ COUNT_CONNECT:int = 0
 USING_PYPY:bool = True
 
 
-class NewThread(Thread):
+class NewConnect(Thread):
     def __init__(self, client_socket, count_connect:int):
         Thread.__init__(self)
         self.client_socket = client_socket
@@ -28,7 +28,10 @@ class NewThread(Thread):
     def write_task(self, number:int, data:bytes) -> None:
         with open(f"new{number}.txt", 'wb') as file:
             file.write(data)
-
+            
+    
+    def reset_server(self):
+        pass
 
     # выполняет задачу и возвращает данные в байтовом формате
     def doind_task(self, file_name:str, isPypy:bool=False) -> bytes:
@@ -83,7 +86,7 @@ class Server():
 
             print(*adress)
             
-            new_connect = NewThread(client_socket=client, count_connect=COUNT_CONNECT)
+            new_connect = NewConnect(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()
             new_connect.join()
     

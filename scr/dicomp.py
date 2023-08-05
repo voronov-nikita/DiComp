@@ -3,10 +3,12 @@
 # ему необходимо "ускорить", путем отправки файла дальше
 
 
+from threading import Thread
 # >>> pip install inspect
 import inspect
 import socket
-import threading
+import sys
+import io
 import os
 
 
@@ -15,7 +17,7 @@ SOCKET_SPEED:int = 4096
 
 IP:str=""
 PORT:int=0
-
+        
 
 class Dicomp():
     
@@ -25,7 +27,7 @@ class Dicomp():
 
 
     # функция-декоратор для отправки файла на сервер и возвращению результата
-    def calculate(self, ip:str, port:int) -> str:
+    def calculate(self, ip:str, port:int, isReturn:bool=False) -> str:
         def new_send_file(func):
 
             # подготовка файлов для сервера
@@ -99,18 +101,52 @@ class Dicomp():
 
             # запуск всех состовляющих
             def run(*args, **kwargs):
-                client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                client_socket.connect((ip, port))
-                
-                wrapper(*args, **kwargs)
+                try:
+                    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    client_socket.connect((ip, port))
+                    
+                    wrapper(*args, **kwargs)
 
-                send_files(f"task{COUNT_TASKS}.txt", client_socket=client_socket)
+                    send_files(f"task{COUNT_TASKS}.txt", client_socket=client_socket)
 
 
-                result = get_result(client_socket=client_socket)
-                client_socket.close()
-                return result
+                    result = get_result(client_socket=client_socket)
+                    client_socket.close()
+                    
+                    # OUTPUT FOR CLIENT
+                    if isReturn:
+                        return result
+                    else:
+                        print(result)
+                        
+                except ConnectionRefusedError as error:
+                    print("ConnectionRefusedError:\tFailed to connect to the server.")
+                    sys.exit()
 
             return run
         return new_send_file
 
+
+# Class for save the data from server.
+# Now you don't need to send the same request again to get a response
+class SaveData():
+    def __init__(self, file_name:str):
+        self.name_time_dir:str = "cache"
+        self.file_name:str = file_name
+    
+    def create_direcory(self):
+        os.mkdir(self.name_time_dir)
+        
+    
+    def save(self):
+        try:
+            data = 
+            with open(self.file_name, 'w') as file:
+                file.write(data)
+                
+            return "Successfully saved."
+        except:
+            return "Saving error."
+        
+    
+    
