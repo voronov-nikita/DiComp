@@ -14,9 +14,6 @@ import os
 
 COUNT_TASKS:int = 0
 SOCKET_SPEED:int = 4096
-
-IP:str=""
-PORT:int=0
         
 
 class Dicomp():
@@ -140,7 +137,7 @@ class SaveData():
     
     def save(self):
         try:
-            data = 
+            data = ""
             with open(self.file_name, 'w') as file:
                 file.write(data)
                 
