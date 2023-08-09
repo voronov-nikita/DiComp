@@ -1,24 +1,14 @@
-from dicomp import Dicomp
-from time import time
+from dicomp import SaveData, Dicomp
 
+sv = SaveData("data1.txt")
 server = Dicomp()
 
 
-@server.calculate(ip="192.168.8.105", port=12345, isReturn=True)
+@server.calculate(ip="192.168.8.103", port=12345, isReturn=True)
 def one(a):
-    for i in range(100):
-        print(a)
+    return a
 
+sv.start_save()
+print(one(70))
 
-def two(a):
-    k=0
-    for i in range(1000):
-        for g in range(1000):
-            for x in range(a):
-                k += i*g*x
-    return k
-
-
-start = time()
-print(one(100))
-print(time() - start)
+sv.stop_save()

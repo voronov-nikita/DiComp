@@ -14,6 +14,10 @@ import os
 
 COUNT_TASKS:int = 0
 SOCKET_SPEED:int = 4096
+
+
+NOT_SAVE:bool = True
+SAVE_NAME:str = ""
         
 
 class Dicomp():
@@ -21,6 +25,9 @@ class Dicomp():
     def __init__(self):
         self.IP:str = ""
         self.PORT:int = 0
+        
+        self.name_cache = "dicomp_cache"
+
 
 
     # функция-декоратор для отправки файла на сервер и возвращению результата
@@ -62,6 +69,9 @@ class Dicomp():
                         finally_name:str = function_name
                         
                     file.write(f"print({finally_name})")
+                    
+                    # вернем финальное имя для того, чтобы определить
+                    return finally_name
                 
 
 
@@ -79,7 +89,6 @@ class Dicomp():
 
                 # очищаем клиента от лишних данных
                 file.close()
-                os.remove(os.path.abspath(f"{file_name}"))
 
 
             # получить результат
@@ -102,10 +111,37 @@ class Dicomp():
                     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     client_socket.connect((ip, port))
                     
-                    wrapper(*args, **kwargs)
-
+                    function_name_with_args = wrapper(*args, **kwargs)
+                    
+                    # Проверить наличие сохранения в файле
+                    try:
+                        with open(f"dicomp_cache/{SAVE_NAME}", 'r') as save_file:
+                            for line in save_file:
+                                if function_name_with_args in line:
+                                    # сразу удалим временный файл
+                                    os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
+                                    # OUTPUT FOR CLIENT
+                                    if isReturn:
+                                        NOT_SAVE = False
+                                        
+                                        # отправим файл-пустышку, чтобы сервер отработал запрос
+                                        send_files(f"dicomp_cache/empty.txt", client_socket=client_socket)
+                                        client_socket.close()
+                                        # срез нужен из-за экранирования \n
+                                        return line.split("::")[1][:-1]
+                                    else:
+                                        NOT_SAVE = True
+                                        # срез нужен из-за экранирования \n
+                                        print(line.split("::")[1][:-1])
+                                    
+                                    client_socket.close()
+                                    break
+                    except PermissionError as e:
+                        print(e)
+                        pass
+                    
                     send_files(f"task{COUNT_TASKS}.txt", client_socket=client_socket)
-
+                    os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
 
                     result = get_result(client_socket=client_socket)
                     client_socket.close()
@@ -124,22 +160,95 @@ class Dicomp():
         return new_send_file
 
 
+
+
+
 # Class for save the data from server.
 # Now you don't need to send the same request again to get a response
 class SaveData():
     def __init__(self, file_name:str):
-        self.name_time_dir:str = "cache"
+        global SAVE_NAME
+        self.name_time_dir:str = "dicomp_cache"
         self.file_name:str = file_name
-    
-    def create_direcory(self):
-        os.mkdir(self.name_time_dir)
+        SAVE_NAME = file_name
+        
+        self.full_directory:str = f"{self.name_time_dir}/{self.file_name}"
+        
+        self.output_catcher = io.StringIO()
+        self.output = None
+        self.file_name_calling:str = ""
         
     
-    def save(self):
+    def start_save(self) -> None:
+        
+        stack = inspect.stack()
+        # The first element of stack - it`s function
+        current_frame = stack[1]
+        # Get file`s name our function 
+        calling_filename = current_frame.filename
+        self.file_name_calling = calling_filename
+        
+        self.original_stdout = sys.stdout
+        sys.stdout = self.output_catcher
+
+
+    def stop_save(self) -> None:
+        
+        sys.stdout = self.original_stdout
+        output = self.output_catcher.getvalue()
+
+        # Выводим перехваченный вывод
+        self.output = output
+        self.save_data_in_file()
+    
+    
+    def check_replay(self) -> list:
+        list_functions:list = []
+        with open(self.full_directory, 'r') as file:
+            for line in file:
+                if line not in list_functions:
+                    list_functions.append(line.split("::")[0])
+        return list_functions
+    
+    
+    def create_direcory(self) -> None:
         try:
-            data = ""
-            with open(self.file_name, 'w') as file:
-                file.write(data)
+            os.mkdir(self.name_time_dir)
+            # создадим файл-пустышку для 
+            with open(f"self.name_time_dir/{empty.txt}", 'w') as file:
+                file.write("print(None)")
+        except FileExistsError:
+            pass
+        
+        
+    def save_data_in_file(self) -> None:
+        self.create_direcory()
+        list_name_function:list = []
+        try:
+            with open(self.file_name_calling, 'r') as file:
+                wr = False
+                for line in file:
+                    if "start_save" in line:
+                        wr = True
+                    elif "stop_save" in line:
+                        wr = False
+                        break
+
+                    if wr and "start_save" not in line:
+                        line = line.replace("print(", "")
+                        list_name_function.append(line[:-2])
+                        
+            
+            data = self.output
+            count_saving:int = 0
+            
+            list_already_saved:list = self.check_replay()
+            
+            if NOT_SAVE:
+                with open(self.full_directory, 'a') as file:
+                    if list_name_function[count_saving] not in list_already_saved:
+                        file.write(list_name_function[count_saving] + "::" + data)
+                        count_saving += 1
                 
             return "Successfully saved."
         except:

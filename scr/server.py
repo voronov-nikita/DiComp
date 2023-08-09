@@ -52,7 +52,7 @@ class NewConnect(Thread):
 
             if file_data:
                 break
-
+        
         self.write_task(self.count_connect, file_data)
         res = self.doind_task(f"new{self.count_connect}.txt", isPypy=USING_PYPY)
         self.client_socket.sendall(res)
@@ -88,7 +88,6 @@ class Server():
             
             new_connect = NewConnect(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()
-            new_connect.join()
     
         
 if __name__=="__main__":
