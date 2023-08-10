@@ -118,26 +118,28 @@ class Dicomp():
                         with open(f"dicomp_cache/{SAVE_NAME}", 'r') as save_file:
                             for line in save_file:
                                 if function_name_with_args in line:
+                                    NOT_SAVE = True
                                     # сразу удалим временный файл
                                     os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
                                     # OUTPUT FOR CLIENT
                                     if isReturn:
-                                        NOT_SAVE = False
-                                        
+
                                         # отправим файл-пустышку, чтобы сервер отработал запрос
                                         send_files(f"dicomp_cache/empty.txt", client_socket=client_socket)
                                         client_socket.close()
                                         # срез нужен из-за экранирования \n
                                         return line.split("::")[1][:-1]
                                     else:
-                                        NOT_SAVE = True
                                         # срез нужен из-за экранирования \n
                                         print(line.split("::")[1][:-1])
                                     
                                     client_socket.close()
                                     break
-                    except PermissionError as e:
-                        print(e)
+                                else:
+                                    NOT_SAVE = False
+                    except PermissionError:
+                        pass
+                    except FileNotFoundError:
                         pass
                     
                     send_files(f"task{COUNT_TASKS}.txt", client_socket=client_socket)
@@ -203,19 +205,23 @@ class SaveData():
     
     
     def check_replay(self) -> list:
-        list_functions:list = []
-        with open(self.full_directory, 'r') as file:
-            for line in file:
-                if line not in list_functions:
-                    list_functions.append(line.split("::")[0])
-        return list_functions
+        try:
+            list_functions:list = []
+            with open(self.full_directory, 'r') as file:
+                for line in file:
+                    if line not in list_functions:
+                        list_functions.append(line.split("::")[0])
+            return list_functions
+        except FileNotFoundError as e:
+            print(e)
+            return []
     
     
     def create_direcory(self) -> None:
         try:
             os.mkdir(self.name_time_dir)
             # создадим файл-пустышку для 
-            with open(f"self.name_time_dir/{empty.txt}", 'w') as file:
+            with open(f"{self.name_time_dir}/empty.txt", 'w') as file:
                 file.write("print(None)")
         except FileExistsError:
             pass
@@ -234,25 +240,26 @@ class SaveData():
                         wr = False
                         break
 
-                    if wr and "start_save" not in line:
+                    if wr and "start_save" not in line and line != "\n":
                         line = line.replace("print(", "")
                         list_name_function.append(line[:-2])
                         
             
-            data = self.output
-            count_saving:int = 0
+            data = self.output.split("\n")
             
             list_already_saved:list = self.check_replay()
-            
             if NOT_SAVE:
+                # open as append in file
                 with open(self.full_directory, 'a') as file:
-                    if list_name_function[count_saving] not in list_already_saved:
-                        file.write(list_name_function[count_saving] + "::" + data)
-                        count_saving += 1
-                
+                    for elems in range(len(list_name_function)):
+                        if list_name_function[elems] not in list_already_saved:
+                            file.write(list_name_function[elems] + "::" + data[elems] + "\n")
+            
+            print("Successfully saved.")
             return "Successfully saved."
         except:
-            return "Saving error."
+            print("Saving Error.")
+            return "Saving Error."
         
     
     

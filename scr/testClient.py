@@ -1,6 +1,6 @@
 from dicomp import SaveData, Dicomp
 
-sv = SaveData("data1.txt")
+sv = SaveData("data.txt")
 server = Dicomp()
 
 
@@ -8,7 +8,13 @@ server = Dicomp()
 def one(a):
     return a
 
-sv.start_save()
-print(one(70))
+# sv.start_save()
 
-sv.stop_save()
+print(one(70))
+print(one(10))
+print(one(200))
+print(one(400))
+print(one(300))
+print(one(300243243))
+
+# sv.stop_save()
