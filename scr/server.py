@@ -1,11 +1,11 @@
-# сервер
-# Здесь будет приниматься вся информация и происходить вычисления
-# потом данные отправляються обратно клиенту
+# server
+# All information will be received here and calculations will take place
+# Then the data is sent back to the client
 
 
-import socket
-import subprocess
 from threading import Thread
+import subprocess
+import socket
 import os
 
 
@@ -15,7 +15,10 @@ PORT:int = 12345
 
 SOCKET_SPEED:int = 4096
 COUNT_CONNECT:int = 0
+# if you use PYPY, then True
 USING_PYPY:bool = True
+
+
 
 
 class NewConnect(Thread):
@@ -24,16 +27,13 @@ class NewConnect(Thread):
         self.client_socket = client_socket
         self.count_connect:int = count_connect
 
-    # сделать запись с полученными данными
+    # make a record with the received data
     def write_task(self, number:int, data:bytes) -> None:
         with open(f"new{number}.txt", 'wb') as file:
             file.write(data)
             
-    
-    def reset_server(self):
-        pass
 
-    # выполняет задачу и возвращает данные в байтовом формате
+    # performs the task and returns data in byte format
     def doind_task(self, file_name:str, isPypy:bool=False) -> bytes:
         if isPypy:
             output = subprocess.check_output(['pypy', file_name]).decode()
@@ -45,7 +45,7 @@ class NewConnect(Thread):
 
     def run(self) -> None:
         while True:
-            # принимаем данные от клиента
+            # we accept data from the client
             data = self.client_socket.recv(SOCKET_SPEED)
 
             file_data = data
@@ -77,7 +77,7 @@ class Server():
         print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}\n")
 
         while True:
-            # принимаем подключения
+            # we accept connections
             client, adress = server_socket.accept()
             
             global COUNT_CONNECT
@@ -86,6 +86,7 @@ class Server():
 
             print(*adress)
             
+            # starting a new thread
             new_connect = NewConnect(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()
     

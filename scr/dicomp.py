@@ -1,6 +1,6 @@
-# Решнение с использованием декораторов для упрощения использования
-# Пускай теперь сам программист будет определять какую часть кода
-# ему необходимо "ускорить", путем отправки файла дальше
+# Solution using decorators to simplify usage
+# Now let the programmer himself determine which part of the code
+# he needs to "speed up" by sending the file further
 
 
 from threading import Thread
@@ -26,23 +26,22 @@ class Dicomp():
         self.IP:str = ""
         self.PORT:int = 0
         
-        self.name_cache = "dicomp_cache"
+        self.name_folder__cache = "dicomp_cache"
 
 
-
-    # функция-декоратор для отправки файла на сервер и возвращению результата
+    # a decorator function for sending a file to the server and returning the result
     def calculate(self, ip:str, port:int, isReturn:bool=False) -> str:
         def new_send_file(func):
 
-            # подготовка файлов для сервера
+            # preparing files for the server
             def wrapper(*args, **kwargs):
                 global COUNT_TASKS
-                # Получение исходного кода функции
-                source_code = inspect.getsource(func)
+                # Getting the source code of the function
+                source_code:str = inspect.getsource(func)
                 
                 LEN_NAME_DECORATE:int = len(source_code[source_code.index("@"):source_code.index("def")])
 
-                # запись задачи 
+                # write a task
                 with open(f"task{COUNT_TASKS}.txt", "w") as file:
                     file.write(source_code[LEN_NAME_DECORATE:])
                     
@@ -50,8 +49,8 @@ class Dicomp():
                     new_function_name:str = line[4:line.index(":")]
                     function_name:str = line[4:line.index(":")]
                     
-                    # если аргументы к функции есть, то
-                    # преобразовываем имя так, чтобы оно соответствовало
+                    # if there are arguments to the function, then
+                    # converting the name so that it matches
                     if len(kwargs) != 0:
                         function_name = function_name[function_name.index("(")+1:]
                         for key, value in kwargs.items():
@@ -70,12 +69,12 @@ class Dicomp():
                         
                     file.write(f"print({finally_name})")
                     
-                    # вернем финальное имя для того, чтобы определить
+                    # вернем финальное имя
                     return finally_name
                 
 
 
-            # отправка файла на сервер
+            # sending a file to the server 
             def send_files(file_name:str, client_socket):
                 
                 result = None
@@ -84,15 +83,14 @@ class Dicomp():
 
                 file_line = file.read()
 
-                # отправляем пакет данных
+                # sending a data packet
                 client_socket.sendall(file_line)
 
-                # очищаем клиента от лишних данных
+                # clearing the client of unnecessary data
                 file.close()
 
 
-            # получить результат
-            # здесь мы будем ждать сообщение от сервера до тех пор, пока оно не придет
+            # we are waiting for a message from the server until it arrives to get the result
             def get_result(client_socket):
                 result = None
                 
@@ -105,7 +103,7 @@ class Dicomp():
                 return result
 
 
-            # запуск всех состовляющих
+            # launching all components
             def run(*args, **kwargs):
                 try:
                     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -113,24 +111,24 @@ class Dicomp():
                     
                     function_name_with_args = wrapper(*args, **kwargs)
                     
-                    # Проверить наличие сохранения в файле
+                    # Check if there is a save in the file
                     try:
-                        with open(f"dicomp_cache/{SAVE_NAME}", 'r') as save_file:
+                        with open(f"{self.name_folder__cache}/{SAVE_NAME}", 'r') as save_file:
                             for line in save_file:
                                 if function_name_with_args in line:
                                     NOT_SAVE = True
-                                    # сразу удалим временный файл
+                                    # immediately delete the temporary file
                                     os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
                                     # OUTPUT FOR CLIENT
                                     if isReturn:
 
-                                        # отправим файл-пустышку, чтобы сервер отработал запрос
-                                        send_files(f"dicomp_cache/empty.txt", client_socket=client_socket)
+                                        # we will send a dummy file so that the server will work out the request
+                                        send_files(f"{self.name_folder__cache}/empty.txt", client_socket=client_socket)
                                         client_socket.close()
-                                        # срез нужен из-за экранирования \n
+                                        # the slice is needed because of the \n escaping
                                         return line.split("::")[1][:-1]
                                     else:
-                                        # срез нужен из-за экранирования \n
+                                        # the slice is needed because of the \n escaping
                                         print(line.split("::")[1][:-1])
                                     
                                     client_socket.close()
@@ -199,7 +197,6 @@ class SaveData():
         sys.stdout = self.original_stdout
         output = self.output_catcher.getvalue()
 
-        # Выводим перехваченный вывод
         self.output = output
         self.save_data_in_file()
     
@@ -213,14 +210,14 @@ class SaveData():
                         list_functions.append(line.split("::")[0])
             return list_functions
         except FileNotFoundError as e:
-            print(e)
             return []
     
-    
+    # creates a folder where all the saves will be placed
+    # + creates an empty file
     def create_direcory(self) -> None:
         try:
             os.mkdir(self.name_time_dir)
-            # создадим файл-пустышку для 
+            # creates an empty file 
             with open(f"{self.name_time_dir}/empty.txt", 'w') as file:
                 file.write("print(None)")
         except FileExistsError:
