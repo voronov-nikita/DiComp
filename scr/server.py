@@ -34,9 +34,11 @@ class NewConnect(Thread):
             
 
     # performs the task and returns data in byte format
-    def doind_task(self, file_name:str, isPypy:bool=False) -> bytes:
+    def doind_task(self, file_name:str, isPypy:bool=False, otherInter:str=None) -> bytes:
         if isPypy:
             output = subprocess.check_output(['pypy', file_name]).decode()
+        elif otherInter is not None:
+            output = subprocess.check_output([otherInter.lower(), file_name]).decode()
         else:
             output = subprocess.check_output(['python', file_name]).decode()
         print("OUT:", output.encode()[:-2], "\n")

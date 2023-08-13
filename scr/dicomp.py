@@ -30,7 +30,7 @@ class Dicomp():
 
 
     # a decorator function for sending a file to the server and returning the result
-    def calculate(self, ip:str, port:int, isReturn:bool=False) -> str:
+    def calculate(self, ip:str, port:int, isReturn:bool=True) -> str:
         def new_send_file(func):
 
             # preparing files for the server
@@ -92,15 +92,13 @@ class Dicomp():
 
             # we are waiting for a message from the server until it arrives to get the result
             def get_result(client_socket):
-                result = None
+                result_data = b""
                 
                 while True:
-                    result_data = client_socket.recv(SOCKET_SPEED)
-                    if result_data:
-                        result = result_data.decode()
-                        break
-
-                return result
+                    data = client_socket.recv(SOCKET_SPEED)
+                    if not data:
+                        return result_data.decode()
+                    result_data += data
 
 
             # launching all components
@@ -126,7 +124,7 @@ class Dicomp():
                                         send_files(f"{self.name_folder__cache}/empty.txt", client_socket=client_socket)
                                         client_socket.close()
                                         # the slice is needed because of the \n escaping
-                                        return line.split("::")[1][:-1]
+                                        return eval(line.split("::")[1][:-1])
                                     else:
                                         # the slice is needed because of the \n escaping
                                         print(line.split("::")[1][:-1])
@@ -148,9 +146,9 @@ class Dicomp():
                     
                     # OUTPUT FOR CLIENT
                     if isReturn:
-                        return result
+                        return eval(result)
                     else:
-                        print(result)
+                        print(result[:-6])
                         
                 except ConnectionRefusedError as error:
                     print("ConnectionRefusedError:\tFailed to connect to the server.")
@@ -158,8 +156,6 @@ class Dicomp():
 
             return run
         return new_send_file
-
-
 
 
 
