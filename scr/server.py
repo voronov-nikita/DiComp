@@ -6,6 +6,7 @@
 from threading import Thread
 import subprocess
 import socket
+import signal
 import os
 
 
@@ -69,7 +70,11 @@ class Server():
         self.PORT = PORT
 
 
-    def run_server(self):
+    def kill_server(self, sig, frame):
+        exit(0)
+
+    # calling for the starting server
+    def run_server(self) -> None:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind((self.IP, self.PORT))
         server_socket.listen()
@@ -78,6 +83,9 @@ class Server():
         print("<" + "--"*10 + ">")
         print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}\n")
 
+        # Установка обработчика сигнала SIGINT
+        signal.signal(signal.SIGINT, self.kill_server)
+        
         while True:
             # we accept connections
             client, adress = server_socket.accept()
@@ -96,3 +104,4 @@ class Server():
 if __name__=="__main__":
     server = Server(IP, PORT)
     server.run_server()
+    

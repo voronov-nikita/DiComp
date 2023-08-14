@@ -18,7 +18,6 @@ SOCKET_SPEED:int = 4096
 
 NOT_SAVE:bool = True
 SAVE_NAME:str = ""
-        
 
 class Dicomp():
     
@@ -71,7 +70,6 @@ class Dicomp():
                     
                     # вернем финальное имя
                     return finally_name
-                
 
 
             # sending a file to the server 
@@ -205,7 +203,7 @@ class SaveData():
                     if line not in list_functions:
                         list_functions.append(line.split("::")[0])
             return list_functions
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             return []
     
     # creates a folder where all the saves will be placed
@@ -253,6 +251,3 @@ class SaveData():
         except:
             print("Saving Error.")
             return "Saving Error."
-        
-    
-    
