@@ -6,7 +6,6 @@
 from threading import Thread
 import subprocess
 import socket
-import signal
 import os
 
 
@@ -47,20 +46,23 @@ class NewConnect(Thread):
 
 
     def run(self) -> None:
-        while True:
-            # we accept data from the client
-            data = self.client_socket.recv(SOCKET_SPEED)
+        try:
+            while True:
+                # we accept data from the client
+                data = self.client_socket.recv(SOCKET_SPEED)
 
-            file_data = data
+                file_data = data
 
-            if file_data:
-                break
-        
-        self.write_task(self.count_connect, file_data)
-        res = self.doind_task(f"new{self.count_connect}.txt", isPypy=USING_PYPY)
-        self.client_socket.sendall(res)
-        os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
-        self.client_socket.close()
+                if file_data:
+                    break
+            
+            self.write_task(self.count_connect, file_data)
+            res = self.doind_task(f"new{self.count_connect}.txt", isPypy=USING_PYPY)
+            self.client_socket.sendall(res)
+            os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
+            self.client_socket.close()
+        except Exception as e:
+            self.client_socket.sendall(bytes(e))
 
 
 
@@ -69,9 +71,6 @@ class Server():
         self.IP = IP
         self.PORT = PORT
 
-
-    def kill_server(self, sig, frame):
-        exit(0)
 
     # calling for the starting server
     def run_server(self) -> None:
@@ -82,9 +81,6 @@ class Server():
 
         print("<" + "--"*10 + ">")
         print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}\n")
-
-        # Установка обработчика сигнала SIGINT
-        signal.signal(signal.SIGINT, self.kill_server)
         
         while True:
             # we accept connections

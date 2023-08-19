@@ -74,8 +74,6 @@ class Dicomp():
 
             # sending a file to the server 
             def send_files(file_name:str, client_socket):
-                
-                result = None
 
                 file = open(file_name, 'rb')
 
