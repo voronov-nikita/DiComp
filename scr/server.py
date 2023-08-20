@@ -35,34 +35,34 @@ class NewConnect(Thread):
 
     # performs the task and returns data in byte format
     def doind_task(self, file_name:str, isPypy:bool=False, otherInter:str=None) -> bytes:
-        if isPypy:
-            output = subprocess.check_output(['pypy', file_name]).decode()
-        elif otherInter is not None:
-            output = subprocess.check_output([otherInter.lower(), file_name]).decode()
-        else:
-            output = subprocess.check_output(['python', file_name]).decode()
-        print("OUT:", output.encode()[:-2], "\n")
-        return output.encode()[:-2]
+        try:
+            if isPypy:
+                output = subprocess.check_output(['pypy', file_name]).decode()
+            elif otherInter is not None:
+                output = subprocess.check_output([otherInter.lower(), file_name]).decode()
+            else:
+                output = subprocess.check_output(['python', file_name]).decode()
+            print("OUT:", output.encode()[:-2], "\n")
+            return output.encode()[:-2]
+        except:
+            return "An error has occurred: check the correctness of the data types and compliance with the rules of writing code.".encode()
 
 
     def run(self) -> None:
-        try:
-            while True:
-                # we accept data from the client
-                data = self.client_socket.recv(SOCKET_SPEED)
+        while True:
+            # we accept data from the client
+            data = self.client_socket.recv(SOCKET_SPEED)
 
-                file_data = data
+            file_data = data
 
-                if file_data:
-                    break
-            
-            self.write_task(self.count_connect, file_data)
-            res = self.doind_task(f"new{self.count_connect}.txt", isPypy=USING_PYPY)
-            self.client_socket.sendall(res)
-            os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
-            self.client_socket.close()
-        except Exception as e:
-            self.client_socket.sendall(bytes(e))
+            if file_data:
+                break
+        
+        self.write_task(self.count_connect, file_data)
+        res = self.doind_task(f"new{self.count_connect}.txt", isPypy=USING_PYPY)
+        self.client_socket.sendall(res)
+        os.remove(os.path.abspath(f"new{self.count_connect}.txt"))
+        self.client_socket.close()
 
 
 

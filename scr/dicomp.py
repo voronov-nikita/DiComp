@@ -19,8 +19,9 @@ SOCKET_SPEED:int = 4096
 NOT_SAVE:bool = True
 SAVE_NAME:str = ""
 
+
+
 class Dicomp():
-    
     def __init__(self):
         self.IP:str = ""
         self.PORT:int = 0
@@ -60,7 +61,18 @@ class Dicomp():
 
                     if len(args) != 0:
                         time_function_name:str = function_name[:function_name.index("(")+1]
-                        time_function_name += str(*args) + ")"
+                        for elems in range(len(args)):
+                            if elems == len(args)-1:
+                                if str(args[elems]).isalpha():
+                                    time_function_name += "'" + str(args[elems]) + "'"
+                                else:
+                                    time_function_name += str(args[elems])
+                            else:
+                                if str(args[elems]).isalpha():
+                                    time_function_name += "'" + str(args[elems]) + "',"
+                                else:
+                                    time_function_name += str(args[elems]) + ","
+                        time_function_name += ")"
                         finally_name:str = time_function_name
                     
                     else:
@@ -110,6 +122,7 @@ class Dicomp():
                         with open(f"{self.name_folder__cache}/{SAVE_NAME}", 'r') as save_file:
                             for line in save_file:
                                 if function_name_with_args in line:
+                                    global NOT_SAVE
                                     NOT_SAVE = True
                                     # immediately delete the temporary file
                                     os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
@@ -142,7 +155,10 @@ class Dicomp():
                     
                     # OUTPUT FOR CLIENT
                     if isReturn:
-                        return eval(result)
+                        try:
+                            return eval(result)
+                        except:
+                            return result
                     else:
                         print(result[:-6])
                         

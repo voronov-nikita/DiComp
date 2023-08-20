@@ -4,13 +4,11 @@ sv = SaveData("data.txt")
 server = Dicomp()
 
 
-@server.calculate(ip="192.168.8.101", port=12345)
+@server.calculate(ip="192.168.8.100", port=12345)
 def one(a):
-    ls=[]
-    for i in range(a):
-        ls.append([i] * i)
-    return ls
+    k=1
+    for i in range(1, a):
+        k *= i
+    return k
 
-
-for i in range(10):
-    print(one(i))
+print(one('a'))
