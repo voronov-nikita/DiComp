@@ -30,7 +30,7 @@ class Dicomp():
 
 
     # a decorator function for sending a file to the server and returning the result
-    def calculate(self, ip:str, port:int, isReturn:bool=True) -> str:
+    def calculate(self, ip:str, port:int, isReturn:bool=True, useSave:bool=True) -> str:
         def new_send_file(func):
 
             # preparing files for the server
@@ -117,31 +117,32 @@ class Dicomp():
                     
                     function_name_with_args = wrapper(*args, **kwargs)
                     
+
                     # Check if there is a save in the file
                     try:
-                        with open(f"{self.name_folder__cache}/{SAVE_NAME}", 'r') as save_file:
-                            for line in save_file:
-                                if function_name_with_args in line:
-                                    global NOT_SAVE
-                                    NOT_SAVE = True
-                                    # immediately delete the temporary file
-                                    os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
-                                    # OUTPUT FOR CLIENT
-                                    if isReturn:
-
-                                        # we will send a dummy file so that the server will work out the request
-                                        send_files(f"{self.name_folder__cache}/empty.txt", client_socket=client_socket)
+                        if useSave:
+                            with open(f"{self.name_folder__cache}/{SAVE_NAME}", 'r') as save_file:
+                                for line in save_file:
+                                    if function_name_with_args in line:
+                                        global NOT_SAVE
+                                        NOT_SAVE = True
+                                        # immediately delete the temporary file
+                                        os.remove(os.path.abspath(f"task{COUNT_TASKS}.txt"))
+                                        # OUTPUT FOR CLIENT
+                                        if isReturn:
+                                            # we will send a dummy file so that the server will work out the request
+                                            send_files(f"{self.name_folder__cache}/empty.txt", client_socket=client_socket)
+                                            client_socket.close()
+                                            # the slice is needed because of the \n escaping
+                                            return eval(line.split("::")[1][:-1])
+                                        else:
+                                            # the slice is needed because of the \n escaping
+                                            print(line.split("::")[1][:-1])
+                                        
                                         client_socket.close()
-                                        # the slice is needed because of the \n escaping
-                                        return eval(line.split("::")[1][:-1])
+                                        break
                                     else:
-                                        # the slice is needed because of the \n escaping
-                                        print(line.split("::")[1][:-1])
-                                    
-                                    client_socket.close()
-                                    break
-                                else:
-                                    NOT_SAVE = False
+                                        NOT_SAVE = False
                     except PermissionError:
                         pass
                     except FileNotFoundError:
