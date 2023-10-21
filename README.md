@@ -5,8 +5,6 @@
 ![image](doc/thrid.png)
 
 
-<br>
-
 ## **Content**
 1. [About](/README.md#about)
 2. [Description](/README.md#description)
