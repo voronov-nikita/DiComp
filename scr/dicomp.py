@@ -26,11 +26,19 @@ class Dicomp():
         self.IP:str = ""
         self.PORT:int = 0
         
-        self.name_folder__cache = "dicomp_cache"
+        self.name_folder_cache = "dicomp_cache"
 
 
     # a decorator function for sending a file to the server and returning the result
     def calculate(self, ip:str, port:int, isReturn:bool=True, useSave:bool=True) -> str:
+        
+        '''
+        The decorator function. 
+        All the basic logic happens right here. 
+        
+        Call this method before your function that needs to be distributed.
+        '''
+        
         def new_send_file(func):
 
             # preparing files for the server
@@ -100,6 +108,11 @@ class Dicomp():
 
             # we are waiting for a message from the server until it arrives to get the result
             def get_result(client_socket):
+                '''
+                A function that returns the final received message.
+                When the data stops coming, the function will automatically return the result.
+                '''
+                
                 result_data = b""
                 
                 while True:
@@ -121,7 +134,7 @@ class Dicomp():
                     # Check if there is a save in the file
                     try:
                         if useSave:
-                            with open(f"{self.name_folder__cache}/{SAVE_NAME}", 'r') as save_file:
+                            with open(f"{self.name_folder_cache}/{SAVE_NAME}", 'r') as save_file:
                                 for line in save_file:
                                     if function_name_with_args in line:
                                         global NOT_SAVE
@@ -131,7 +144,7 @@ class Dicomp():
                                         # OUTPUT FOR CLIENT
                                         if isReturn:
                                             # we will send a dummy file so that the server will work out the request
-                                            send_files(f"{self.name_folder__cache}/empty.txt", client_socket=client_socket)
+                                            send_files(f"{self.name_folder_cache}/empty.txt", client_socket=client_socket)
                                             client_socket.close()
                                             # the slice is needed because of the \n escaping
                                             return eval(line.split("::")[1][:-1])
@@ -189,6 +202,14 @@ class SaveData():
         
     
     def start_save(self) -> None:
+        '''
+        The function will start reading everything from the console and 
+        translating it to the interpreter.
+        The value is taken from the interpreter and written to a variable.
+        
+        Returns nothing. 
+        Requires the end_save() method in its construction.
+        '''
         
         stack = inspect.stack()
         # The first element of stack - it`s function
