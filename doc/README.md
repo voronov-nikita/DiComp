@@ -1,6 +1,6 @@
 # Documentation
 
-С файлом-описанием действий самого кода можно ознакомиться [здесь](/doc/DescriptionCode.md)
+С файлом-описанием действий самого кода можно ознакомиться [здесь](/doc/DescriptionCode.md).
 
 ----------------
 
@@ -109,4 +109,4 @@ saves.stop_save()
 <br><br>
 
 
-###### 20.10.2023 - last README.md change.
+###### 25.10.2023 - last README.md change.
