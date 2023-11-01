@@ -26,6 +26,7 @@
 
 
 
+
 ## **Useful Links**
 1. python - [python.org](https://python.org)
    
@@ -69,6 +70,11 @@
 
 Сервер теперь многопоточен, что позволит одновременно вычислять несколько задач;
 
+**01.11.2023** -добвлена информация:
+1. добавлена базовая документация по пользованию библиотекой;
+2. добавлена документация, описывающая части кода клиентской части;
+3. добавлена документация, описывающая части кода серверной части;
+
 
 
 ## **Keywords**
@@ -80,7 +86,7 @@
 <br>
 
 
-###### 14.10.2023 - last change.
+###### 01.11.2023 - last change.
 
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
