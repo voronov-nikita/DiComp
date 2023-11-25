@@ -4,8 +4,11 @@
 
 
 from threading import Thread
+from datetime import datetime
 import subprocess
+import logging
 import socket
+import sys
 import os
 
 
@@ -70,34 +73,71 @@ class Server():
     def __init__(self, IP:str, PORT:int):
         self.IP = IP
         self.PORT = PORT
-
+        
+    
+    def start(self):
+        '''
+        Start main components for server.
+        '''
+        self.logs("START")
+        Thread(target=self.runServer, daemon=True).start()
+        flag = True
+        while flag:
+            n = input(">> ")
+            
+            if n=="exit" or n == "Ex":
+                print("Stopping server...")
+                flag = False
+                break
+                
+            elif n=="tasks" or n=="Ts":
+                print(f"Connections: {COUNT_CONNECT}")
+                logging.info(f"Connections: {COUNT_CONNECT}")
+        input("Are you sure you want to suspend the server? [Enter]")
+        self.logs("STOP")
 
     # calling for the starting server
-    def run_server(self) -> None:
+    def runServer(self) -> None:
+        '''
+        
+        '''
+        
+        print("<" + "--" * 10 + ">")
+        print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}\n")
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind((self.IP, self.PORT))
         server_socket.listen()
-
-
-        print("<" + "--"*10 + ">")
-        print(f"SERVER IS RUN...\nIP: {self.IP}\nPORT: {self.PORT}\n")
         
         while True:
             # we accept connections
             client, adress = server_socket.accept()
-            
+            self.logs("ADD", *adress)
             global COUNT_CONNECT
 
             COUNT_CONNECT += 1
-
-            print(*adress)
             
+            logging.info(f"Add new connect: {adress}")
             # starting a new thread
             new_connect = NewConnect(client_socket=client, count_connect=COUNT_CONNECT)
             new_connect.start()
-    
+            
+    def logs(self, message:str, *any) -> None:
+        '''
         
+        '''
+        fileLog = open("log.log", 'a')
+        mainText:str = f"[{datetime.now()}] "
+        
+        if message == "START":
+            fileLog.write(mainText + f"Starting the server...")
+        elif message == "ADD":
+            fileLog.write(mainText + f"Add new connect from {any};")
+        elif message == "STOP":
+            fileLog.write(mainText + f"Shutting down the server...")
+        fileLog.write("\n")
+
+
 if __name__=="__main__":
     server = Server(IP, PORT)
-    server.run_server()
+    server.start()
     

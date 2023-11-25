@@ -1,16 +1,8 @@
-from dicomp import SaveData, Dicomp
+import threading
 
-sv = SaveData("data.txt")
-server = Dicomp()
+def loop():
+    while True:
+        print('something')
 
-sv.start_save()
-
-
-@server.calculate(ip="192.168.8.100", port=12345)
-def one(a, b):
-    res = 0
-    for i in range(a):
-        res += b
-    return res
-
-print(one(50, 10))
+threading.Thread(target=loop, daemon=True).start()
+input('Press <Enter> to exit.')

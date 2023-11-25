@@ -255,6 +255,10 @@ class SaveData():
         
         
     def save_data_in_file(self) -> None:
+        '''
+        a function that implements
+        the creation or connection to a file with stored function values.
+        '''
         self.create_direcory()
         list_name_function:list = []
         try:
