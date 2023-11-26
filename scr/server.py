@@ -8,7 +8,6 @@ from datetime import datetime
 import subprocess
 import logging
 import socket
-import sys
 import os
 
 
