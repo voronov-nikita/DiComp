@@ -21,8 +21,6 @@ COUNT_CONNECT:int = 0
 USING_PYPY:bool = True
 
 
-
-
 class NewConnect(Thread):
     def __init__(self, client_socket, count_connect:int):
         Thread.__init__(self)
@@ -98,6 +96,10 @@ class Server():
     # calling for the starting server
     def runServer(self) -> None:
         '''
+        The function starts the main components of the server and makes it workable.
+        
+        At the very beginning, it displays information about the IP address and 
+        PORT of connection to the server's communication channel.
         
         '''
         
@@ -122,7 +124,9 @@ class Server():
             
     def logs(self, message:str, *any) -> None:
         '''
+        Logging function for tracking errors and other concepts from the server side.
         
+        It takes in the initial message for logs, then the data itself.
         '''
         fileLog = open("log.log", 'a')
         mainText:str = f"[{datetime.now()}] "

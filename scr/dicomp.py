@@ -20,7 +20,6 @@ NOT_SAVE:bool = True
 SAVE_NAME:str = ""
 
 
-
 class Dicomp():
     def __init__(self):
         self.IP:str = ""
@@ -182,7 +181,6 @@ class Dicomp():
 
             return run
         return new_send_file
-
 
 
 # Class for save the data from server.
