@@ -18,7 +18,7 @@ PORT:int = 12345
 SOCKET_SPEED:int = 4096
 COUNT_CONNECT:int = 0
 # if you use PYPY, then True
-USING_PYPY:bool = True
+USING_PYPY:bool = False
 
 
 class NewConnect(Thread):
