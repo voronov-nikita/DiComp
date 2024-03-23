@@ -3,17 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <title>Registrstion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='registration.css') }}">
 </head>
 <body>
     <div class="container">
-        <h2>Вход в систему</h2>
-        <form action="/login" method="post">
+        <h2>Регистрация</h2>
+        <form action="/registration" method="post">
             <label for="username">Имя пользователя:</label>
             <input type="text" id="username" name="username">
+
+            <label for="email">Электронная почта</label>
+            <input type="email" id="email" name="email">
+
             <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" name="password1">
+
+            <label for="ago_password">Повторите пароль:</label>
+            <input type="password" id="ago_password" name="password2">
+
             <input class="main-button-auth" type="submit" value="Войти">
         </form>
 

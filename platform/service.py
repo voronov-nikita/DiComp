@@ -4,7 +4,7 @@ import secrets
 import json
 
 
-# константные данные для порта и имени на котором хостится приложение
+# константные данные для порта и имени хоста на котором хостится приложение
 PORT: int = 8080
 HOST: str = "localhost"
 
@@ -32,7 +32,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        if chackLoginData(username, password):
+        if checkLogin(username, password):
             session['username'] = username
             return redirect(url_for('account'))
         else:
@@ -40,6 +40,25 @@ def login():
 
     return render_template('login.html')
 
+# GET-POST метод для авторизации пользователя и показа формы
+@app.route('/registration', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        ago_password = request.form['ago_password']
+        
+        if password == ago_password:
+            if addNewUser(username, password):
+                session['username'] = username
+                return redirect(url_for('account'))
+            else:
+                return 'Неверные учетные данные'
+        else:
+            return "пароли не совпадают"
+
+    return render_template('registration.html')
 
 # POST метод выхода из аккаунта
 @app.route('/logout')

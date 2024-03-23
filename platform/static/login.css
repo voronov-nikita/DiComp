@@ -1,12 +1,14 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #191919;
+
+    color: #45a049;
 }
 
 .container {
     width: 300px;
     margin: 100px auto;
-    background-color: #ffffff;
+    background-color: #343434;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
@@ -36,12 +38,13 @@ input[type="password"] {
 input[type="submit"] {
     padding: 10px;
     border: none;
-    background-color: #007bff;
+    background-color: #2a992e;
     color: #ffffff;
     cursor: pointer;
     border-radius: 4px;
+    margin-bottom: 10px;
 }
 
 input[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: #4CAF50;
 }
