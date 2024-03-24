@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Forum DiComp</title>
+	</head>
+	<body>
+		{% if question %}
+		<h1>Ваш вопрос:</h1>
+		<p>{{ question }}</p>
+
+		<h1>Ответ:</h1>
+		<p>{{ answer }}</p>
+		<a href="/forum">Задать еще вопрос</a>
+		{% else %}
+		<h1>Задайте свой вопрос</h1>
+		<form action="/ask" method="post">
+			<input
+				type="text"
+				name="question"
+				placeholder="Введите ваш вопрос"
+				required
+			/>
+			<button type="submit">Задать</button>
+		</form>
+		{% endif %}
+	</body>
+</html>

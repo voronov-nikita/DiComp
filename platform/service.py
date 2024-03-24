@@ -1,7 +1,6 @@
 from flask import Flask, render_template, session, redirect, url_for, request
 from database import *
 import secrets
-import json
 
 
 # константные данные для порта и имени хоста на котором хостится приложение
@@ -24,6 +23,26 @@ print("Секретный ключ:", key)
 def index():
     return render_template('index.html')
 
+# обработчик старницы about
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+# обработчик старницы help
+@app.route('/help')
+def help():
+    return render_template('help.html')
+
+# обработчик старницы forum
+@app.route('/forum')
+def forum():
+    return render_template('forum.html')
+
+# личный кабинет пользователей
+@app.route('/account')
+def account():
+    return render_template('account.html')
+
 
 # GET-POST метод для авторизации пользователя и показа формы
 @app.route('/login', methods=['GET', 'POST'])
@@ -39,6 +58,10 @@ def login():
             return 'Неверные учетные данные'
 
     return render_template('login.html')
+
+
+# <------------------- ОБРАБОТЧИК ЛОГИКО ЗАВИСИМЫХ СТРУКТУР POST ЗАПРОСОВ ----------------------->
+
 
 # GET-POST метод для авторизации пользователя и показа формы
 @app.route('/registration', methods=['GET', 'POST'])
@@ -60,6 +83,7 @@ def register():
 
     return render_template('registration.html')
 
+
 # POST метод выхода из аккаунта
 @app.route('/logout')
 def logout():
@@ -67,10 +91,12 @@ def logout():
     return redirect(url_for('/'))
 
 
-# личный кабинет пользователей
-@app.route('/account')
-def account():
-    return render_template('account.html')
+@app.route('/ask', methods=['POST'])
+def ask():
+    question = request.form['question']
+    answer = "Ответ на вопрос"
+    return render_template('forum.html', question=question, answer=answer)
+
 
 
 # <---------------- ОБРАБОТЧИКИ ОШИБОК ------------------->
