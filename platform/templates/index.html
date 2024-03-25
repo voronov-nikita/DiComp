@@ -1,14 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DiComp</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='header.css') }}">
-</head>
-<body>
-    {% include 'header.html' %}
-    {% include 'content.html' %}
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>DiComp</title>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="{{ url_for('static', filename='styles.css') }}"
+		/>
+		<link
+			rel="stylesheet"
+			type="text/css"
+			href="{{ url_for('static', filename='header.css') }}"
+		/>
+	</head>
+
+	<body>
+		{% include 'header.html' %} 
+        {% include 'content.html' %}
+	</body>
+
+	<footer class="footer">
+		<div class="container">
+			<p>
+				&copy; 2024 voronov-nikita.
+			</p>
+		</div>
+	</footer>
 </html>

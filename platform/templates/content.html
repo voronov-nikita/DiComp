@@ -2,4 +2,31 @@
     <form action="{{ url_for('handle_button_click') }}" method="post">
         <button type="submit">Нажми меня</button>
     </form>
+
+    <div class="card-container">
+
+        <div class="card">
+            <h2>Распределенное хранилище</h2>
+            <p>Некоторая информация о чем-то интересном...</p>
+            <form action="/button_clicked" method="post">
+                <button type="submit">Подробнее</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Распределение данных</h2>
+            <p>Некоторая информация о чем-то интересном...</p>
+            <form action="/button_clicked" method="post">
+                <button type="submit">Подробнее</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Децентрализованная сеть</h2>
+            <p>Некоторая информация о чем-то интересном...</p>
+            <form action="/button_clicked" method="post">
+                <button type="submit">Подробнее</button>
+            </form>
+        </div>
+    </div>
 </div>

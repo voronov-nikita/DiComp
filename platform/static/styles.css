@@ -1,26 +1,83 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #191919;
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background-color: #191919;
 }
 
-
 .content {
-    text-align: center;
-    margin-top: 50px;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	margin-top: 50px;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+	padding: 10px 20px;
+	font-size: 16px;
+	background-color: #4caf50;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
 }
 
 button:hover {
-    background-color: #45a049;
+	background-color: #45a049;
+}
+
+/* Элементы для карточек */
+
+.card-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: flex-top;
+}
+
+.card {
+	width: 300px;
+	background-color: #343434;
+	border-radius: 8px;
+	border: #45a049;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+	margin: 20px;
+}
+.card h2 {
+	margin-top: 0;
+	color: #1aaf5d;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	min-width: 20%;
+}
+.card p {
+	margin-bottom: 20px;
+	text-align: left;
+	color: #ffffff;
+}
+.card button {
+	padding: 10px 20px;
+	background-color: #4caf50;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
+.card button:hover {
+	background-color: #0056b3;
+}
+
+/* Стили для футера */
+.footer {
+	background-color: #333;
+	color: #878787;
+	padding: 20px 0;
+	text-align: center;
+    align-items: flex-end;
+}
+
+.footer p {
+	margin: 0;
 }
