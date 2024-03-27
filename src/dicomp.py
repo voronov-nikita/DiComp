@@ -3,10 +3,10 @@
 # he needs to "speed up" by sending the file further
 
 
-from threading import Thread
 # >>> pip install inspect
 import inspect
 import socket
+import gzip
 import sys
 import io
 import os
@@ -97,9 +97,10 @@ class Dicomp():
                 file = open(file_name, 'rb')
 
                 file_line = file.read()
-
-                # sending a data packet
-                client_socket.sendall(file_line)
+                compressed_data = gzip.compress(file_line)
+                
+                # sending a compressing data packet
+                client_socket.sendall(compressed_data)
 
                 # clearing the client of unnecessary data
                 file.close()

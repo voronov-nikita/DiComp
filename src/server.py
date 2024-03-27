@@ -8,6 +8,7 @@ from datetime import datetime
 import subprocess
 import logging
 import socket
+import gzip
 import os
 
 
@@ -30,6 +31,7 @@ class NewConnect(Thread):
     # make a record with the received data
     def write_task(self, number:int, data:bytes) -> None:
         with open(f"new{number}.txt", 'wb') as file:
+            data = gzip.decompress(data)
             file.write(data)
             
 
