@@ -78,8 +78,35 @@ button:hover {
     align-items: flex-end;
 }
 
+.container{
+	font-size: 18px;
+	display: flex;
+    align-items: center;
+	justify-content: center;
+	margin-left: 5%;
+
+}
+
+.row{
+	margin-right: auto;
+	white-space: nowrap;
+}
+
 .footer p {
 	margin: 0;
+}
+
+.footer h3{
+	text-decoration-line: underline;
+}
+
+.footer a {
+	color: #878787;
+	text-decoration-line: none;
+}
+
+.footer-links{
+	text-align: left;
 }
 
 link[rel="icon"] {

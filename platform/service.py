@@ -44,6 +44,26 @@ def account():
     return render_template('account.html')
 
 
+@app.route('/prog1')
+def prog1():
+    return render_template('prog1.html')
+
+@app.route('/prog2')
+def prog2():
+    return render_template('prog2.html')
+
+@app.route('/prog3')
+def prog3():
+    return render_template('prog3.html')
+
+@app.route('/prog4')
+def prog4():
+    return render_template('prog4.html')
+
+@app.route('/prog5')
+def prog5():
+    return render_template('prog5.html')
+
 # GET-POST метод для авторизации пользователя и показа формы
 @app.route('/login', methods=['GET', 'POST'])
 def login():
