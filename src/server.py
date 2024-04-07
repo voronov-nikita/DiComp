@@ -3,8 +3,8 @@
 # Then the data is sent back to the client
 
 
-from threading import Thread
 from datetime import datetime
+from threading import Thread
 import subprocess
 import logging
 import socket

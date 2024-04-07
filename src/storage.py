@@ -9,9 +9,9 @@
 from threading import Thread
 import sqlite3 as sql
 import configparser
+import logging
 import socket
-
-# from net import *
+import zlib
 
 
 # Описание конфигурации текущего файла
@@ -109,7 +109,7 @@ class Storage():
         db.commit()
         db.close()
 
-    def _addDatabase(self, user: str, servers: list, fileName: str = "") -> bool | tuple:
+    def _addDatabase(self, user: str, servers: list, fileName: str = "") -> tuple:
         '''
         Функция добавления новых данных в базу данных с серверами и текущими сессиями.
 
@@ -142,16 +142,50 @@ class Storage():
         except Exception as error:
             return False, error
 
-    def getFile(self, file: str) -> None:
+    def getFile(self, fileId: int, filePath: str = "..") -> tuple:
+        '''
+        Функция получения файла со всех подсерверов на которых находяться части данного файла.
+
+        Функция является базовой для головного сервера, предоставляющего данные.
+
+        Функция отправляет запрос на сервер, чтобы получить собранный файл обратно.
+        Для этого используется id файла, который необходимо собрать.
+        
+        В случае успеха функция вернет кортеж, где на первой позиции будет находиться булевое выражение типа True.
+        Иначе вернется кортеж, где первым эллементом будет являться False, а далее ошибка.
+        
+        Каждый новый вызов сопровождается записью данных в качестве логирования действий.
+        
         '''
 
-        '''
+        conn, addr = self.sock.accept()
 
-        pass
+        try:
+            # Получаем размер сжатых данных
+            compressed_size = int.from_bytes(conn.recv(4), byteorder='big')
 
-    def sendFile(seklf, file: str, timeName: str = "time0.txt") -> bool:
+            # Получаем сжатые данные
+            compressed_data = conn.recv(compressed_size)
+            # Распаковываем данные
+            decompressed_data = zlib.decompress(compressed_data)
+
+            # Записываем распакованные данные в файл
+            with open(filePath, 'wb') as f:
+                f.write(decompressed_data)
+
+            logging.info("Файл успешно получен")
+
+            return True, 
+
+        except Exception as error:
+            logging.error("Возникла непредвиденная ошибка:\n")
+            logging.error(error)
+
+            return False, error
+
+    def sendFile(self, file: str, timeName: str = "time0.txt") -> tuple:
         '''
-        Функция отправки собранного файла обратно клиенту.
+        Функция отправки собранного файла на сервер.
 
         Функция создает временный файл с новым именем потока или именем по умолчанию.
 
@@ -160,9 +194,26 @@ class Storage():
         '''
 
         try:
-            return True
+            # Открываем файл для чтения в бинарном режиме.
+            with open(file, 'rb') as f:
+                file_data = f.read()
+
+            # используя встроенную функцию библиотеки компрессии сжимаем файл по максимуму без потери данных.
+            compressed_data = zlib.compress(
+                file_data, level=zlib.Z_BEST_COMPRESSION)
+
+            self.sock.sendall(
+                len(compressed_data).to_bytes(4, byteorder='big'))
+
+            # Отправляем сжатые данные
+            self.sock.sendall(compressed_data)
+
+            logging.info("Файл успешно отправлен")
+            return True, 
 
         except Exception as error:
+            logging.error("Возникла непредвиденная ошибка:\n")
+            logging.error(error)
             return False, error
 
     def checkFile(self, fileId: int) -> bool:
