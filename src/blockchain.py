@@ -64,7 +64,7 @@ def handle_connection(client_socket, blockchain):
             data = json.loads(data)
             index = len(blockchain.chain)
             new_block = Block(index, time.time(), data,
-                              blockchain.get_latest_block().hash)
+                            blockchain.get_latest_block().hash)
             blockchain.add_block(new_block)
             client_socket.send("Block added successfully".encode())
     client_socket.close()
